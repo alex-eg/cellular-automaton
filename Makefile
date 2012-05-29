@@ -1,6 +1,6 @@
 CC = g++
 CFLAGS = -ggdb -std=c++0x -Wall
-LIBS = -lSDL -lGL -lGLEW
+LIBS = -lSDL -lGL -lGLEW -lSDL_ttf
 OBJ = Life.o Set.o Graphics.o
 
 life: 

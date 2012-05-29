@@ -2,6 +2,7 @@
 
 void Grid::DrawBorder()
 {
+    glDisable(GL_BLEND);
     glColor3f(0.5, 0.5, 0.5);
     glBegin(GL_LINES);
     glVertex2f(0, 0);
@@ -22,6 +23,7 @@ void Grid::DrawBorder()
     glVertex2f(0, (cellsize+1)*width);
     glVertex2f((cellsize+1)*width, (cellsize+1)*width);
     glEnd();
+    glEnable(GL_BLEND);
 }
 
 void Grid::Draw()
@@ -72,7 +74,7 @@ bool Graphics::Init()
     SDL_GL_SetAttribute(SDL_GL_ACCUM_ALPHA_SIZE,    8);
     
     if ((display = SDL_SetVideoMode(width, height, 32, SDL_HWSURFACE | SDL_DOUBLEBUF | SDL_OPENGL)) == NULL) return false;
-
+    
     /* Load and init GLEW */
     glewExperimental = true;
     GLenum err = glewInit();
@@ -92,18 +94,126 @@ bool Graphics::Init()
     if (!Bloom.Compile()) std::cout<<"Failed compiling shader\n";
     
     /* Set OpenGL parameters */
+    glBlendFunc(GL_ONE, GL_ONE);
+    glEnable(GL_BLEND);
+
     glDisable(GL_DEPTH_TEST);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity ();
-    glOrtho(0, width, height, 0, 0, 1);
+    glOrtho(0, width, height, 0, -1, 1); //!!!!//
     glMatrixMode(GL_MODELVIEW);
-    glTranslatef(0.375, 0.375, 0);
-   
 
+    dx = (width - grid.GetWidth() * grid.cellsize)/2;
+    dy = (height - grid.GetHeight() * grid.cellsize)/2;
+
+    glTranslatef(0.375, 0.375, 0);
     uniform_tex0 = glGetUniformLocation(Bloom.ShaderProgram,"tex0");
   
-    // glActiveTexture(GL_TEXTURE1);
+    return hud.Init();
+}
 
-    glGenFramebuffers(1, &fbo);
+int Graphics::nextpoweroftwo(int x)
+{
+    double logbase2 = log(x) / log(2);
+    return round(pow(2,ceil(logbase2)));
+}
+
+/* Class HUD */
+
+bool HUD::Init(void)
+{
+    if (TTF_Init() == -1) {
+	std::cout<<"TTF init failed\n";
+	return false;
+    }
+    font = TTF_OpenFont("DejaVuSansMono.ttf", 24);
+    if (font == NULL ) {
+	std::cout<<"Loading font failed\n";
+	return false;
+    }
     return true;
+}
+
+void HUD::RenderText(const char *text, SDL_Rect *location, SDL_Color *color)
+{
+    SDL_Surface *initial;
+    SDL_Surface *intermediary;
+    int w,h;
+    GLuint texture;
+
+    initial = TTF_RenderUTF8_Blended(font, text, *color);
+	
+    w = Graphics::nextpoweroftwo(initial->w);
+    h = Graphics::nextpoweroftwo(initial->h);
+	
+    intermediary = SDL_CreateRGBSurface(0, w, h, 32, 
+					0x00ff0000, 
+					0x0000ff00, 
+					0x000000ff, 
+					0xff000000);
+    
+    SDL_BlitSurface(initial, 0, intermediary, 0);
+	
+    /* Tell GL about our new texture */
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glTexImage2D(GL_TEXTURE_2D, 0, 4, w, h, 0, GL_BGRA, 
+		 GL_UNSIGNED_BYTE, intermediary->pixels );
+	
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);	
+    
+    /* Prepare to render our texture */
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glColor3f(1.0f, 1.0f, 1.0f);
+	
+    /* Draw a texture quad at location */
+    glBegin(GL_QUADS);
+
+    glTexCoord2f(0.0f, 1.0f); 
+    glVertex2f(location->x    , location->y);
+    glTexCoord2f(1.0f, 1.0f); 
+    glVertex2f(location->x + w, location->y);
+    glTexCoord2f(1.0f, 0.0f); 
+    glVertex2f(location->x + w, location->y + h);
+    glTexCoord2f(0.0f, 0.0f); 
+    glVertex2f(location->x    , location->y + h);
+    glEnd();
+	
+    /* Bad things happen if we delete the texture before it finishes */
+    glFinish();
+	
+    /* return the deltas in the unused w,h part of the rect */
+    location->w = initial->w;
+    location->h = initial->h;
+	
+    /* Clean up */
+    SDL_FreeSurface(initial);
+    SDL_FreeSurface(intermediary);
+    glDeleteTextures(1, &texture);
+}
+
+void HUD::glEnable2D()
+{
+	int vPort[4];
+  
+	glGetIntegerv(GL_VIEWPORT, vPort);
+  
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+  
+	glOrtho(0, vPort[2], 0, vPort[3], -1, 1);
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+}
+
+void HUD::glDisable2D()
+{
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();   
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
 }

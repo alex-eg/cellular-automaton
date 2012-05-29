@@ -3,9 +3,12 @@
 
 #include <SDL/SDL.h>
 #include <GL/glew.h>
+#include <SDL/SDL_ttf.h>
 #include "LMatrix.hpp"
 #include "Shader.hpp"
 #include <iostream>
+#include <string>
+#include <math.h>
 
 class Grid {
 private:
@@ -26,6 +29,16 @@ public:
 	return *this;
     }
 
+    int GetHeight(void)
+    {
+	return height;
+    }
+
+    int GetWidth(void)
+    {
+	return width;
+    }
+
     void Draw();
     void DrawWithMap(LMatrix <unsigned char> *M);
     void DrawBorder();
@@ -36,24 +49,45 @@ struct RelativePosition {
     double y;
 };
 
-class Graphics {
-private:
-    int uniform_tex0;
-    int width, height; /* SDL window */
+class HUD {
 public:
-    GLuint fbo, texture;
+
+    TTF_Font *font;
+
+    bool Init();
+    void RenderText(const char *text, SDL_Rect *location, SDL_Color *color);
+    static void glEnable2D();
+    static void glDisable2D();
+
+    HUD &operator = (const HUD &right) 
+    {
+	if (this == &right)
+	    return *this;
+	if (font != NULL) TTF_CloseFont(font);
+	font = right.font;
+	return *this;
+    }
+};
+
+class Graphics {
+public:
+    int width, height; /* SDL window */
+    int uniform_tex0;
+    double dx, dy; /* Scaling displacement */
+    GLuint fbo, bloom_texture;
     Grid grid;
     SDL_Surface *display;
     DefaultShader Shade;
     Shader Bloom;
     struct RelativePosition SDL_OGL;
+    HUD hud;
 
     Graphics()
     {
 	display = NULL;
 	SDL_OGL.x = SDL_OGL.y = 0.375;
 	fbo = 0;
-	texture = 0;
+	bloom_texture = 0;
 	width = height = 800;
     }
 
@@ -63,7 +97,7 @@ public:
 	SDL_OGL.x = 0.375;
 	SDL_OGL.y = 0.375;
 	fbo = 0;
-	texture = 0;
+	bloom_texture = 0;
     }
 
     Graphics &operator = (const Graphics &right) 
@@ -75,7 +109,7 @@ public:
 	SDL_OGL.x = right.SDL_OGL.x;
 	SDL_OGL.y = right.SDL_OGL.y;
 	fbo = right.fbo;
-	texture = right.texture;
+	bloom_texture = right.bloom_texture;
 	width = right.width;
 	height = right.height;
 	return *this;
@@ -83,6 +117,7 @@ public:
 
     ~Graphics() {}
     bool Init();
+    static int nextpoweroftwo(int x);
 };
 
 #endif

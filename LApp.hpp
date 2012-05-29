@@ -7,9 +7,9 @@ struct BoardSize {
     unsigned int y;
 };
 
-struct Settings {
-    void v;
-};
+// struct Settings {
+//     void v;
+// };
 
 class LApp {
  private:
@@ -22,6 +22,9 @@ class LApp {
     unsigned char whatDraw;
     struct BoardSize Board;
     Graphics graphics;
+
+    bool help;
+
     inline void __Init__(void);
  public:
     LApp();
@@ -29,13 +32,22 @@ class LApp {
  public:
     bool Init();
     int Execute();
+
     void Event(SDL_Event *event);
+    void Event_Field(SDL_Event *event);
+    void Event_Help(SDL_Event *event);
+
     void Loop();
+
     void Render();
+    void Render_Field();
+    void Render_Help();
+
     void Clean();
  public:
     void Exit();
     void KeyDown(SDLKey sym, SDLMod mod, Uint16 unicode);
+    void HelpKeyDown(SDLKey sym, SDLMod mod, Uint16 unicode);
     void KeyUp(SDLKey sym, SDLMod mod, Uint16 unicode);
     void MouseMove(int mX, int mY, int relX, int relY, bool Left,bool Right,bool Middle);
     void MouseButtonDown(Uint8 button, int x, int y);

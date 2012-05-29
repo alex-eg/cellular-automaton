@@ -12,6 +12,7 @@ inline void LApp::__Init__(void)
     update_counter = 0;
     speed = 3;
     whatDraw = 1;
+    help = false;
 }
 
 LApp::LApp()
@@ -48,46 +49,77 @@ bool LApp::Init()
     life = LLife(Board.x, Board.y);
 
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) < 0) return false;
-   
     return graphics.Init();
 }
 
 void LApp::Render()
 {
+    if (help) Render_Help();
+    else Render_Field();
+}
+
+void LApp::Render_Help()
+{
+    glClear(GL_COLOR_BUFFER_BIT);
+    HUD::glEnable2D();
+
+    SDL_Rect position;
+    SDL_Color color = { 255, 255, 255 };
+ 
+    position.x = 160;
+    position.y = 700;
+    graphics.hud.RenderText("Несложный симулятор \"Жизни\" Конвея", &position, &color);
+    position.x = 30;
+    position.y = 600;
+    position.y -= position.h;
+    graphics.hud.RenderText("F1                           показать/скрыть эту справку", &position, &color);
+    position.y -= position.h;
+    graphics.hud.RenderText("Пробел                       остановить/продолжить", &position, &color);
+    position.y -= position.h;
+    graphics.hud.RenderText("S                            один шаг", &position, &color);
+    position.y -= position.h;
+    graphics.hud.RenderText("R                            случайно заполнить поле", &position, &color);
+    position.y -= position.h;
+    graphics.hud.RenderText("C                            очистить поле", &position, &color);
+    position.y -= position.h;
+    graphics.hud.RenderText("Правая кнопка мыши           рисовать/стирать", &position, &color);
+    position.y -= position.h;
+    graphics.hud.RenderText("Левая кнопка мыши            перемещать обзор", &position, &color);
+    position.y -= position.h;
+    graphics.hud.RenderText("Колесо мыши                  приблизить/отдалить", &position, &color);
+    position.y -= position.h;
+    graphics.hud.RenderText("ESC                          выход", &position, &color);
+
+    HUD::glDisable2D();
+
+    SDL_GL_SwapBuffers();
+}
+
+void LApp::Render_Field()
+{
+
+    glPushMatrix();
+    glTranslatef(graphics.dx, graphics.dy, 0.0);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    // glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-    // CatchErrorOpengl(__LINE__);
-    // glFramebufferTexture2D(GL_FRAMEBUFFER,
-    //  			   GL_COLOR_ATTACHMENT0,
-    //  			   GL_TEXTURE_2D,
-    //  			   texture,
-    //  			   0);
-    //CatchErrorOpengl(__LINE__);
     graphics.grid.DrawWithMap(life.front);
-
-    // glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    // CatchErrorOpengl(__LINE__);
-
-    //glBindTexture(GL_TEXTURE_2D, texture);
-
-    //Bloom.Begin();
- //    if(Bloom.Running) glUniform1i(uniform_tex0, 1);
-    
-     
-    // glBegin(GL_QUADS);
-    // glTexCoord2d(0.0,0.0); glVertex2d(0.0,0.0);
-    // glTexCoord2d(1.0,0.0); glVertex2d(1.0,0.0);
-    // glTexCoord2d(1.0,1.0); glVertex2d(1.0,1.0);
-    // glTexCoord2d(0.0,1.0); glVertex2d(0.0,1.0);
-    // glEnd();
-
-    //Bloom.End();
-
-    // glDeleteTextures(1, &texture);
     graphics.grid.DrawBorder();
+    
     if (graphics.grid.cellsize > 22) graphics.grid.Draw();
 
+    glPopMatrix();
+    if (!updating) {
+	HUD::glEnable2D();
+	
+	SDL_Rect position;
+	SDL_Color color = {0, 128, 255};
+	position.x = 10;
+	position.y = 760;
+	graphics.hud.RenderText("Пауза", &position, &color);
+
+	HUD::glDisable2D();
+    }
+    
     SDL_GL_SwapBuffers();
 }
 
@@ -107,7 +139,10 @@ void LApp::Loop()
 
 void LApp::Clean()
 {
+    glFinish();
     glDeleteFramebuffers(1, &graphics.fbo);
+    TTF_CloseFont(graphics.hud.font);
+    TTF_Quit();
     SDL_FreeSurface(graphics.display);
     SDL_Quit();
     std::cout<<"Clean normal, exitting\n";

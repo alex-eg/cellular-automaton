@@ -37,7 +37,7 @@ int LApp::Execute()
 	while (SDL_PollEvent(&event)) Event(&event);
 	Loop();
 	Render();
-	SDL_Delay(5);
+	SDL_Delay(1);
     }
     Clean();
     return 0;
@@ -47,19 +47,35 @@ bool LApp::Init()
 {
     graphics.grid = Grid(Board.x, Board.y, 10);
     life = Automaton(Board.x, Board.y);
-
+    
     AutomatonState dead = AutomatonState(0, 0.0, 0.0, 0.0, "dead");
     AutomatonState live = AutomatonState(1, 0.3, 0.8765, 0.3, "live");
     
     std::map <statecode, Set<int>> born_req;
-    Set <int> born_req_count;
-    born_req_count.add(3);
-    born_req[live.code] = born_req_count;
+	Set <int> born_req_count;
+    // born_req_count.add(3); Game Of Life
+	// born_req_count.add(3); AMOEBA
+	// born_req_count.add(5);
+	// born_req_count.add(7);
+	born_req_count.add(3);
+	born_req_count.add(5);
+	born_req_count.add(6);
+	born_req_count.add(7);
+	born_req_count.add(8);
+	born_req[live.code] = born_req_count;
     
     std::map <statecode, Set<int>> surv_req;
     Set <int> surv_req_count;
-    surv_req_count.add(3);
-    surv_req_count.add(2);
+    // surv_req_count.add(3); Game Of life
+    // surv_req_count.add(2);
+	// surv_req_count.add(1); AMOEBA
+	// surv_req_count.add(3);
+	// surv_req_count.add(5);
+	// surv_req_count.add(8);
+	surv_req_count.add(5);
+	surv_req_count.add(6);
+	surv_req_count.add(7);
+	surv_req_count.add(8);
     surv_req[live.code] = surv_req_count;
 
     AutomatonTransition born = AutomatonTransition(live.code, dead.code, born_req, "born");

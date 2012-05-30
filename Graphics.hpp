@@ -9,7 +9,7 @@
 #include <iostream>
 #include <string>
 #include <math.h>
-#include "Life.hpp"
+#include "Automaton.hpp"
 
 class Grid {
 private:

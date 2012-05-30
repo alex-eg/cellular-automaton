@@ -1,5 +1,4 @@
 #include "Graphics.hpp"
-#include "Life.hpp"
 
 void Grid::DrawBorder()
 {

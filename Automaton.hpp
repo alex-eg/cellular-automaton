@@ -1,5 +1,5 @@
-#ifndef _L_LIFE
-#define _L_LIFE
+#ifndef _L_AUTOMATON
+#define _L_AUTOMATON
 
 #include "LMatrix.hpp"
 #include "Set.hpp"

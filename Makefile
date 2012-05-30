@@ -1,7 +1,7 @@
 CC = g++
 CFLAGS = -std=c++0x -Wall
 LIBS = -lSDL -lGL -lGLEW -lSDL_ttf
-OBJ = Life.o Graphics.o Automaton.o
+OBJ = Graphics.o Automaton.o
 
 automaton:
 	$(CC) -c -o Automaton.o Automaton.cpp $(LIBS) $(CFLAGS)
@@ -24,13 +24,16 @@ events:
 shader:
 	$(CC) -c -o Shader.o Shader.cpp $(LIBS) $(CFLAGS)
 
-app: life lapp graphics events shader
+app: automaton lapp graphics events shader
 	$(CC) -o LApp Lapp.o LEvent.o Shader.o $(OBJ) $(LIBS) $(CFLAGS)
 
 all: app
 
-debug: CFLAGS += "-ggdb"
+debug: CFLAGS += -ggdb
 debug: all 
+
+optimized: CFLAGS += -O2
+optimized: all
 
 clean:
 	rm -f ./*~ ./*.o

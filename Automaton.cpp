@@ -1,4 +1,4 @@
-#include "Life.hpp"
+#include "Automaton.hpp"
 #include <iostream>
 
 void Automaton::Update(void)

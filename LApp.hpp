@@ -1,5 +1,5 @@
 #include <SDL/SDL.h>
-#include "Life.hpp"
+#include "Automaton.hpp"
 #include "Graphics.hpp"
 
 struct BoardSize {

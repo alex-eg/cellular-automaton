@@ -4,8 +4,11 @@
 void Automaton::Update(void)
 {
     for (int i=0; i<height; i++)
-	for (int j=0; j<width; j++)
+	for (int j=0; j<width; j++) {
+	    StateCount[(*front)(i,j)]--;
 	    (*back)(i,j) = Transition[State[(*front)(i,j)].code](Neighbours(i,j));
+	    StateCount[(*back)(i,j)]++;
+	}
     LMatrix <statecode> *temp;
     temp = front;
     front = back;
@@ -37,21 +40,29 @@ std::map <statecode, int> Automaton::Neighbours(int x, int y)
 
 void Automaton::Draw(int x, int y, statecode val)
 {
+    StateCount[(*front)(x,y)]--;
     (*front)(x,y) = val;
+    StateCount[(*front)(x,y)]++;
 }
 
 void Automaton::Randomize()
 {
     for (int i=0; i<height; i++)
-	for (int j=0; j<width; j++)
+	for (int j=0; j<width; j++) {
+	    StateCount[(*front)(i,j)]--;
 	    (*front)(i,j) = rand() % 2;
+	    StateCount[(*front)(i,j)]++;
+	}
 }
 
 void Automaton::Clear()
 {
     for (int i=0; i<height; i++)
-	for (int j=0; j<width; j++)
+	for (int j=0; j<width; j++) {
+	    StateCount[1] = 0;
 	    (*front)(i,j) = 0;
+	    StateCount[0] = width*height;
+	}
 }
 
 void Automaton::AddState(AutomatonState s, AutomatonTransition t)

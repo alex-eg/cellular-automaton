@@ -19,16 +19,17 @@ class LApp {
     int counter, speed;
     Automaton life;
     bool nowDrawing;
-    unsigned char whatDraw;
+    statecode whatDraw;
     struct BoardSize Board;
     Graphics graphics;
 
     bool help;
 
     inline void __Init__(void);
+    std::string rule;
  public:
     LApp();
-    LApp(unsigned int x, unsigned int y);
+    LApp(unsigned int x, unsigned int y, std::string r);
  public:
     bool Init();
     int Execute();

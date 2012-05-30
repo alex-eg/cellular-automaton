@@ -10,7 +10,7 @@ inline void LApp::__Init__(void)
     nowDrawing = false;
     counter = 0;
     update_counter = 0;
-    speed = 3;
+    speed = 2;
     whatDraw = 1;
     help = false;
 }
@@ -21,11 +21,12 @@ LApp::LApp()
     Board.x = Board.y = 40;
 }
 
-LApp::LApp(unsigned int x, unsigned int y)
+LApp::LApp(unsigned int x, unsigned int y, std::string r)
 {
     __Init__();
     Board.x = x;
     Board.y = y;
+    rule = r;
 }
 
 int LApp::Execute()
@@ -45,6 +46,8 @@ int LApp::Execute()
 
 bool LApp::Init()
 {
+    size_t found;
+    
     graphics.grid = Grid(Board.x, Board.y, 10);
     life = Automaton(Board.x, Board.y);
     
@@ -52,30 +55,19 @@ bool LApp::Init()
     AutomatonState live = AutomatonState(1, 0.3, 0.8765, 0.3, "live");
     
     std::map <statecode, Set<int>> born_req;
-	Set <int> born_req_count;
-    // born_req_count.add(3); Game Of Life
-	// born_req_count.add(3); AMOEBA
-	// born_req_count.add(5);
-	// born_req_count.add(7);
-	born_req_count.add(3);
-	born_req_count.add(5);
-	born_req_count.add(6);
-	born_req_count.add(7);
-	born_req_count.add(8);
-	born_req[live.code] = born_req_count;
+    Set <int> born_req_count;
+
+    found = rule.find("/");
+    if (found == std::string::npos) return false;
+    for (size_t i = found+1; i<rule.length(); i++)
+	born_req_count.add((int)(rule[i]-48));
+    born_req[live.code] = born_req_count;
     
     std::map <statecode, Set<int>> surv_req;
     Set <int> surv_req_count;
-    // surv_req_count.add(3); Game Of life
-    // surv_req_count.add(2);
-	// surv_req_count.add(1); AMOEBA
-	// surv_req_count.add(3);
-	// surv_req_count.add(5);
-	// surv_req_count.add(8);
-	surv_req_count.add(5);
-	surv_req_count.add(6);
-	surv_req_count.add(7);
-	surv_req_count.add(8);
+
+    for (size_t i = 0; i<found; i++)
+	surv_req_count.add((int)(rule[i]-48));
     surv_req[live.code] = surv_req_count;
 
     AutomatonTransition born = AutomatonTransition(live.code, dead.code, born_req, "born");
@@ -101,30 +93,38 @@ void LApp::Render_Help()
 
     SDL_Rect position;
     SDL_Color color = { 255, 255, 255 };
- 
+
+    glEnable(GL_BLEND);
+
     position.x = 160;
     position.y = 700;
-    graphics.hud.RenderText("Несложный симулятор \"Жизни\" Конвея", &position, &color);
-    position.x = 30;
+    graphics.hud.RenderText("Несложный симулятор \"Жизни\" Конвея", &position, &color, size24);
+    position.x = 55;
     position.y = 600;
     position.y -= position.h;
-    graphics.hud.RenderText("F1                           показать/скрыть эту справку", &position, &color);
+    graphics.hud.RenderText("F1                                       показать/скрыть эту справку", &position, &color, size16);
     position.y -= position.h;
-    graphics.hud.RenderText("Пробел                       остановить/продолжить", &position, &color);
+    graphics.hud.RenderText("Пробел                                   остановить/продолжить", &position, &color, size16);
     position.y -= position.h;
-    graphics.hud.RenderText("S                            один шаг", &position, &color);
+    graphics.hud.RenderText("S                                        один шаг", &position, &color, size16);
     position.y -= position.h;
-    graphics.hud.RenderText("R                            случайно заполнить поле", &position, &color);
+    graphics.hud.RenderText("R                                        случайно заполнить поле", &position, &color, size16);
     position.y -= position.h;
-    graphics.hud.RenderText("C                            очистить поле", &position, &color);
+    graphics.hud.RenderText("C                                        очистить поле", &position, &color, size16);
     position.y -= position.h;
-    graphics.hud.RenderText("Правая кнопка мыши           рисовать/стирать", &position, &color);
+    graphics.hud.RenderText("Правая кнопка мыши                       рисовать/стирать", &position, &color, size16);
     position.y -= position.h;
-    graphics.hud.RenderText("Левая кнопка мыши            перемещать обзор", &position, &color);
+    graphics.hud.RenderText("Левая кнопка мыши                        перемещать обзор", &position, &color, size16);
     position.y -= position.h;
-    graphics.hud.RenderText("Колесо мыши                  приблизить/отдалить", &position, &color);
+    graphics.hud.RenderText("Колесо мыши                              приблизить/отдалить", &position, &color, size16);
     position.y -= position.h;
-    graphics.hud.RenderText("ESC                          выход", &position, &color);
+    graphics.hud.RenderText("Num +                                    увеличить скорость", &position, &color, size16);
+    position.y -= position.h;
+    graphics.hud.RenderText("Num -                                    уменьшить скорость", &position, &color, size16);
+    position.y -= position.h;
+    graphics.hud.RenderText("ESC                                      выход", &position, &color, size16);
+
+    glDisable(GL_BLEND);
 
     HUD::glDisable2D();
 
@@ -134,10 +134,10 @@ void LApp::Render_Help()
 void LApp::Render_Field()
 {
 
+    glClear(GL_COLOR_BUFFER_BIT); 
+
     glPushMatrix();
     glTranslatef(graphics.dx, graphics.dy, 0.0);
- 
-    glClear(GL_COLOR_BUFFER_BIT);
 
     graphics.grid.DrawWithMap(life);
     graphics.grid.DrawBorder();
@@ -148,16 +148,48 @@ void LApp::Render_Field()
     
     if (!updating) {
 	HUD::glEnable2D();
-	
+	glEnable(GL_BLEND);
+
 	SDL_Rect position;
-	SDL_Color color = {0, 128, 255};
+	SDL_Color color = {255, 255, 255};
 	position.x = 10;
 	position.y = 760;
-	graphics.hud.RenderText("Пауза", &position, &color);
+	graphics.hud.RenderText("Пауза", &position, &color, size24);
 
-	HUD::glDisable2D();
+	glDisable(GL_BLEND);
+	HUD::glDisable2D();	
     }
+
+    glPushMatrix();
+    glLoadIdentity();
+    glBegin(GL_QUADS);
+    glColor3f(0.0, 0.0, 0.0);
+    glVertex2f(  0, 800);
+    glVertex2f(  0, 760);
+    glVertex2f(800, 760);
+    glVertex2f(800, 800);
+    glEnd();
+    glPopMatrix();
+
+    HUD::glEnable2D();
+
+    SDL_Rect position;
+    SDL_Color color = {255, 255, 255};
+
+    char buff[64];
+   
+    position.x = 10;
+    position.y = 0;
+    graphics.hud.RenderText(("Правило: "+rule).c_str(), &position, &color, size16);
+    position.x = 300;
+    sprintf(buff, "Живых: %d", life.StateCount[1]);
+    graphics.hud.RenderText(buff, &position, &color, size16);
+    position.x = 500;
+    sprintf(buff, "Мертвых: %d", life.StateCount[0]);
+    graphics.hud.RenderText( buff, &position, &color, size16);
     
+    HUD::glDisable2D();
+
     SDL_GL_SwapBuffers();
 }
 
@@ -180,7 +212,8 @@ void LApp::Clean()
     glFinish();
     if (graphics.fbo != 0)
 	glDeleteFramebuffers(1, &graphics.fbo);
-    TTF_CloseFont(graphics.hud.font);
+    TTF_CloseFont(graphics.hud.font16);
+    TTF_CloseFont(graphics.hud.font24);
     TTF_Quit();
     SDL_FreeSurface(graphics.display);
     SDL_Quit();
@@ -190,13 +223,16 @@ void LApp::Clean()
 /* ---------------------------------------------  */
 int main(int argc, char **argv)
 {
-    if (argc<3) {
-	LApp Life(50, 50);
+    if (argc == 1) {
+	LApp Life(150, 150, "23/3");
 	return Life.Execute();
-    } else {
+    } else if (argc == 4) {
 	int x = atoi(argv[1]);
 	int y = atoi(argv[2]);
-	LApp Life(x, y);
+	LApp Life(x, y, argv[3]);
+	return Life.Execute();
+    } else {
+	LApp Life(150, 150, argv[1]);
 	return Life.Execute();
     }
 }

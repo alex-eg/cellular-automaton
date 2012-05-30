@@ -11,6 +11,8 @@
 #include <math.h>
 #include "Automaton.hpp"
 
+enum FontSize {size24, size16};
+
 class Grid {
 private:
     int height, width;
@@ -52,11 +54,11 @@ struct RelativePosition {
 
 class HUD {
 public:
-
-    TTF_Font *font;
+    TTF_Font *font24;
+    TTF_Font *font16;
 
     bool Init();
-    void RenderText(const char *text, SDL_Rect *location, SDL_Color *color);
+    void RenderText(const char *text, SDL_Rect *location, SDL_Color *color, enum FontSize s);
     static void glEnable2D();
     static void glDisable2D();
 
@@ -64,8 +66,12 @@ public:
     {
 	if (this == &right)
 	    return *this;
-	if (font != NULL) TTF_CloseFont(font);
-	font = right.font;
+	if (font24 != NULL) TTF_CloseFont(font24);
+	font16 = right.font16;
+
+	if (font16 != NULL) TTF_CloseFont(font16);
+	font16 = right.font16;
+
 	return *this;
     }
 };

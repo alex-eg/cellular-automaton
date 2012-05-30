@@ -12,6 +12,7 @@ class AutomatonState {
 private: 
     double color[3];
     std::string name;
+    int lifespan;
 public:
     statecode code;
     AutomatonState()
@@ -19,13 +20,15 @@ public:
 	name = "Unnamed state";
 	color = { 0.0, 0.0, 0.0 };
 	code = 0;
+	lifespan = 0;
     }
 	
-    AutomatonState(statecode c, double r, double g, double b, std::string n)
+    AutomatonState(statecode c, double r, double g, double b, std::string n, int l = 0)
     {
 	code = c;
 	color = { r, g, b };
 	name = n;
+	lifespan = l;
     }
     
     double *GetColor(void)
@@ -40,6 +43,7 @@ public:
 	name = right.name;
 	color = { right.color[0], right.color[1], right.color[2]};
 	code = right.code;
+	lifespan = right.lifespan;
 	return *this;
     }
 };
@@ -101,6 +105,7 @@ private:
 public:
     std::map <statecode, AutomatonTransition> Transition;
     std::map <statecode, AutomatonState> State;
+    std::map <statecode, int> StateCount;
     LMatrix <statecode> *front;
 
     Automaton()
@@ -124,6 +129,7 @@ public:
 	for (int i=0; i<height; i++)
 	    for (int j=0; j<width; j++)
 		field1(i,j) = field2(i,j) = 0;
+	StateCount[0] = width*height;
     }
 
    Automaton &operator = (const Automaton &right)
@@ -138,6 +144,7 @@ public:
 	
 	Transition = right.Transition;
 	State = right.State;
+	StateCount = right.StateCount;
 	front = &field1;
 	back = &field2;
 	return *this;

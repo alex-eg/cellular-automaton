@@ -2,7 +2,6 @@
 
 void Grid::DrawBorder()
 {
-    glDisable(GL_BLEND);
     glColor3f(0.5, 0.5, 0.5);
     glBegin(GL_LINES);
     glVertex2f(0, 0);
@@ -23,21 +22,26 @@ void Grid::DrawBorder()
     glVertex2f(0, (cellsize+1)*width);
     glVertex2f((cellsize+1)*width, (cellsize+1)*width);
     glEnd();
-    glEnable(GL_BLEND);
 }
 
 void Grid::Draw()
 {
+    glColor3f(0.8, 0.8, 0.8);
     for(int i = 1; i<=width; i++) {
+	if (i == width/2) glColor3f(0.2, 0.723, 0.32);
 	glBegin(GL_LINES);
 	glVertex2f(cellsize*i+i, 0);
 	glVertex2f(cellsize*i+i, (cellsize+1)*height);
 	glEnd();
-	
+	if (i == width/2) glColor3f(0.8, 0.8, 0.8);
+    }
+    for(int i = 1; i<=height; i++) {
+	if (i == height/2) glColor3f(0.2, 0.723, 0.32);
 	glBegin(GL_LINES);
 	glVertex2f(0, cellsize*i+i);
 	glVertex2f((cellsize+1)*width, cellsize*i+i);
 	glEnd();
+	if (i == width/2) glColor3f(0.8, 0.8, 0.8);
     }
 }
 
@@ -96,13 +100,14 @@ bool Graphics::Init()
     if (!Bloom.Compile()) std::cout<<"Failed compiling shader\n";
     
     /* Set OpenGL parameters */
+    glClearColor(0.07, 0.03, 0.05, 0.0);
+
     glBlendFunc(GL_ONE, GL_ONE);
-    glEnable(GL_BLEND);
 
     glDisable(GL_DEPTH_TEST);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity ();
-    glOrtho(0, width, height, 0, -1, 1); //!!!!//
+    glOrtho(0, width, height, 0, -1, 1);
     glMatrixMode(GL_MODELVIEW);
 
     dx = (width - grid.GetWidth() * grid.cellsize)/2;
@@ -128,23 +133,33 @@ bool HUD::Init(void)
 	std::cout<<"TTF init failed\n";
 	return false;
     }
-    font = TTF_OpenFont("DejaVuSansMono.ttf", 24);
-    if (font == NULL ) {
+    font24 = TTF_OpenFont("DejaVuSansMono.ttf", 24);
+    if (font24 == NULL ) {
 	std::cout<<"Loading font failed\n";
 	return false;
     }
+
+    font16 = TTF_OpenFont("DejaVuSansMono.ttf", 16);
+    if (font16 == NULL ) {
+	std::cout<<"Loading font failed\n";
+	return false;
+    }
+
     return true;
 }
 
-void HUD::RenderText(const char *text, SDL_Rect *location, SDL_Color *color)
+void HUD::RenderText(const char *text, SDL_Rect *location, SDL_Color *color, enum FontSize s)
 {
     SDL_Surface *initial;
     SDL_Surface *intermediary;
     int w,h;
     GLuint texture;
 
-    initial = TTF_RenderUTF8_Blended(font, text, *color);
-	
+    if (s == size24)
+	initial = TTF_RenderUTF8_Blended(font24, text, *color);
+    else
+	initial = TTF_RenderUTF8_Blended(font16, text, *color);
+
     w = Graphics::nextpoweroftwo(initial->w);
     h = Graphics::nextpoweroftwo(initial->h);
 	
@@ -198,24 +213,25 @@ void HUD::RenderText(const char *text, SDL_Rect *location, SDL_Color *color)
 
 void HUD::glEnable2D()
 {
-	int vPort[4];
+    
+    int vPort[4];
   
-	glGetIntegerv(GL_VIEWPORT, vPort);
+    glGetIntegerv(GL_VIEWPORT, vPort);
   
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
   
-	glOrtho(0, vPort[2], 0, vPort[3], -1, 1);
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadIdentity();
+    glOrtho(0, vPort[2], 0, vPort[3], -1, 1);
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
 }
 
 void HUD::glDisable2D()
 {
-	glMatrixMode(GL_PROJECTION);
-	glPopMatrix();   
-	glMatrixMode(GL_MODELVIEW);
-	glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();   
+    glMatrixMode(GL_MODELVIEW);
+    glPopMatrix();
 }

@@ -116,6 +116,16 @@ void LApp::KeyDown(SDLKey sym, SDLMod mod, Uint16 unicode)
 	counter = 0;
 	break;
     }
+    case SDLK_F1: {
+	if (help) {
+	    
+	    help = false;
+	} else {
+	    help = true;
+	    updating = false;
+	}
+	break;
+    }
     default: break;
     }
 }
@@ -130,16 +140,6 @@ void LApp::KeyUp(SDLKey sym, SDLMod mod, Uint16 unicode)
     case SDLK_s: {
 	updatingstep = false;
 	update_counter = 0;
-	break;
-    }
-    case SDLK_F1: {
-	if (help) {
-	    
-	    help = false;
-	} else {
-	    help = true;
-	    updating = false;
-	}
 	break;
     }
     default: break;

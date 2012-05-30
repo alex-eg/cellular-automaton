@@ -9,11 +9,12 @@
 #include <iostream>
 #include <string>
 #include <math.h>
+#include "Life.hpp"
 
 class Grid {
 private:
     int height, width;
-    inline void FillCell(int x, int y);
+    inline void FillCell(int x, int y, double *color);
 public:
     Grid(){}
     int cellsize;
@@ -40,7 +41,7 @@ public:
     }
 
     void Draw();
-    void DrawWithMap(LMatrix <unsigned char> *M);
+    void DrawWithMap(Automaton &M);
     void DrawBorder();
 };
 

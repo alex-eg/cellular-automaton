@@ -46,7 +46,27 @@ int LApp::Execute()
 bool LApp::Init()
 {
     graphics.grid = Grid(Board.x, Board.y, 10);
-    life = LLife(Board.x, Board.y);
+    life = Automaton(Board.x, Board.y);
+
+    AutomatonState dead = AutomatonState(0, 0.0, 0.0, 0.0, "dead");
+    AutomatonState live = AutomatonState(1, 0.3, 0.8765, 0.3, "live");
+    
+    std::map <statecode, Set<int>> born_req;
+    Set <int> born_req_count;
+    born_req_count.add(3);
+    born_req[live.code] = born_req_count;
+    
+    std::map <statecode, Set<int>> surv_req;
+    Set <int> surv_req_count;
+    surv_req_count.add(3);
+    surv_req_count.add(2);
+    surv_req[live.code] = surv_req_count;
+
+    AutomatonTransition born = AutomatonTransition(live.code, dead.code, born_req, "born");
+    AutomatonTransition survive = AutomatonTransition(live.code, dead.code, surv_req, "survive");
+
+    life.AddState(dead, born);
+    life.AddState(live, survive);
 
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) < 0) return false;
     return graphics.Init();
@@ -100,14 +120,16 @@ void LApp::Render_Field()
 
     glPushMatrix();
     glTranslatef(graphics.dx, graphics.dy, 0.0);
+ 
     glClear(GL_COLOR_BUFFER_BIT);
 
-    graphics.grid.DrawWithMap(life.front);
+    graphics.grid.DrawWithMap(life);
     graphics.grid.DrawBorder();
     
     if (graphics.grid.cellsize > 22) graphics.grid.Draw();
 
     glPopMatrix();
+    
     if (!updating) {
 	HUD::glEnable2D();
 	
@@ -140,7 +162,8 @@ void LApp::Loop()
 void LApp::Clean()
 {
     glFinish();
-    glDeleteFramebuffers(1, &graphics.fbo);
+    if (graphics.fbo != 0)
+	glDeleteFramebuffers(1, &graphics.fbo);
     TTF_CloseFont(graphics.hud.font);
     TTF_Quit();
     SDL_FreeSurface(graphics.display);

@@ -1,13 +1,10 @@
 CC = g++
-CFLAGS = -ggdb -std=c++0x -Wall
+CFLAGS = -std=c++0x -Wall
 LIBS = -lSDL -lGL -lGLEW -lSDL_ttf
-OBJ = Life.o Set.o Graphics.o
+OBJ = Life.o Graphics.o Automaton.o
 
-life: 
-	$(CC) -c -o Life.o Life.cpp $(LIBS) $(CFLAGS)
-
-set:
-	$(CC) -c -o Set.o Set.cpp $(LIBS) $(CFLAGS)
+automaton:
+	$(CC) -c -o Automaton.o Automaton.cpp $(LIBS) $(CFLAGS)
 
 life_test:
 	$(CC) -c -o LifeTest.o LifeTest.cpp $(LIBS) $(CFLAGS)
@@ -27,8 +24,13 @@ events:
 shader:
 	$(CC) -c -o Shader.o Shader.cpp $(LIBS) $(CFLAGS)
 
-app: life set lapp graphics events shader
+app: life lapp graphics events shader
 	$(CC) -o LApp Lapp.o LEvent.o Shader.o $(OBJ) $(LIBS) $(CFLAGS)
+
+all: app
+
+debug: CFLAGS += "-ggdb"
+debug: all 
 
 clean:
 	rm -f ./*~ ./*.o

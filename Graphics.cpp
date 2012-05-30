@@ -1,4 +1,5 @@
 #include "Graphics.hpp"
+#include "Life.hpp"
 
 void Grid::DrawBorder()
 {
@@ -41,16 +42,18 @@ void Grid::Draw()
     }
 }
 
-void Grid::DrawWithMap(LMatrix <unsigned char> *M)
+void Grid::DrawWithMap(Automaton &life)
 {
     for (int i=0; i<height; i++)
-	for(int j=0; j<width; j++)
-	    if ((*M)(i,j) != 0) FillCell(i,j);
+	for(int j=0; j<width; j++) {
+	    statecode cell_state = life(i,j);
+	    FillCell(i, j, life.State[cell_state].GetColor());
+	}
 }
 
-inline void Grid::FillCell(int x, int y)
+inline void Grid::FillCell(int x, int y, double *color)
 {
-    glColor3f(0.3, 0.8765, 0.3);
+    glColor3f(color[0], color[1], color[2]);
     glBegin(GL_QUADS);
     glVertex2f((cellsize+1)*x+1, (cellsize+1)*y+1);
     glVertex2f((cellsize+1)*x+cellsize+1, (cellsize+1)*y+1);

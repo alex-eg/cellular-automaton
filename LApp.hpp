@@ -17,7 +17,7 @@ class LApp {
     bool updating, updatingstep;
     int update_counter;
     int counter, speed;
-    LLife life;
+    Automaton life;
     bool nowDrawing;
     unsigned char whatDraw;
     struct BoardSize Board;

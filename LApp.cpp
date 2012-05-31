@@ -182,10 +182,10 @@ void LApp::Render_Field()
     position.y = 0;
     graphics.hud.RenderText(("Правило: "+rule).c_str(), &position, &color, size16);
     position.x = 300;
-    sprintf(buff, "Живых: %d", life.StateCount[1]);
+    sprintf(buff, "Активных: %d", life.StateCount[1]);
     graphics.hud.RenderText(buff, &position, &color, size16);
     position.x = 500;
-    sprintf(buff, "Мертвых: %d", life.StateCount[0]);
+    sprintf(buff, "Неактивных: %d", life.StateCount[0]);
     graphics.hud.RenderText( buff, &position, &color, size16);
     
     HUD::glDisable2D();

@@ -39,7 +39,7 @@ public:
     AutomatonState &operator = (const AutomatonState &right)
     {
 	if (this == &right)
-            return *this;
+	    return *this;
 	name = right.name;
 	color = { right.color[0], right.color[1], right.color[2]};
 	code = right.code;
@@ -70,7 +70,7 @@ public:
     AutomatonTransition &operator = (const AutomatonTransition &right)
     {
 	if (this == &right)
-            return *this;
+	    return *this;
 	name = right.name;
 	requirements = right.requirements;
 	met_code = right.met_code;
@@ -82,11 +82,11 @@ public:
     {
 	bool r_met = true;
 	std::map <statecode, Set<int>>::iterator it = requirements.begin();
-	    for (; it != requirements.end(); it++) {
-		statecode req_code =(*it).first;
-		int neighbour_count = (*neighbours.find(req_code)).second;
-		if ( !(*it).second.in(neighbour_count) ) r_met = false;
-	    }
+	for (; it != requirements.end(); it++) {
+	    statecode req_code =(*it).first;
+	    int neighbour_count = (*neighbours.find(req_code)).second;
+	    if ( !(*it).second.in(neighbour_count) ) r_met = false;
+	}
 	    
 	if (r_met) return met_code;
 	else return unmet_code;
@@ -132,7 +132,7 @@ public:
 	StateCount[0] = width*height;
     }
 
-   Automaton &operator = (const Automaton &right)
+    Automaton &operator = (const Automaton &right)
     {
 	if (this == &right)
 	    return *this;
@@ -156,5 +156,4 @@ public:
     void Draw(int x, int y, statecode val);
     void Randomize();
 };
-
 #endif

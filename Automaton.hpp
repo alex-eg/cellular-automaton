@@ -18,7 +18,9 @@ public:
     AutomatonState()
     {
 	name = "Unnamed state";
-	color = { 0.0, 0.0, 0.0 };
+	color[0] = 0.0;
+	color[1] = 0.0;
+	color[2] = 0.0;
 	code = 0;
 	lifespan = 0;
     }
@@ -26,7 +28,9 @@ public:
     AutomatonState(statecode c, double r, double g, double b, std::string n, int l = 0)
     {
 	code = c;
-	color = { r, g, b };
+	color[0] =  r;
+	color[1] = g;
+	color[2] = b;
 	name = n;
 	lifespan = l;
     }
@@ -41,7 +45,9 @@ public:
 	if (this == &right)
 	    return *this;
 	name = right.name;
-	color = { right.color[0], right.color[1], right.color[2]};
+	color[0] = right.color[0];
+	color[1] = right.color[1];
+	color[2] = right.color[2];
 	code = right.code;
 	lifespan = right.lifespan;
 	return *this;

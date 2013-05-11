@@ -1,4 +1,4 @@
-#include "Automaton.hpp"
+#include "automaton.hpp"
 #include <iostream>
 
 void Automaton::Update(void)

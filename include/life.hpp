@@ -1,6 +1,6 @@
 #include <SDL/SDL.h>
-#include "Automaton.hpp"
-#include "Graphics.hpp"
+#include "automaton.hpp"
+#include "graphics.hpp"
 
 struct BoardSize {
     unsigned int x;
@@ -30,7 +30,7 @@ class LApp {
  public:
     LApp();
     LApp(unsigned int x, unsigned int y, std::string r);
- public:
+
     bool Init();
     int Execute();
 
@@ -45,7 +45,7 @@ class LApp {
     void Render_Help();
 
     void Clean();
- public:
+
     void Exit();
     void KeyDown(SDLKey sym, SDLMod mod, Uint16 unicode);
     void HelpKeyDown(SDLKey sym, SDLMod mod, Uint16 unicode);

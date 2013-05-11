@@ -1,4 +1,4 @@
-#include "Parser.hpp"
+#include "parser.hpp"
 
 void Parser::Parse(std::string filename)
 {

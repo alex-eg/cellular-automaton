@@ -1,4 +1,4 @@
-#include "Shader.hpp"
+#include "shader.hpp"
 
 unsigned int Shader::FileLength(std::ifstream &file)
 {

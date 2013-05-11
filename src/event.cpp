@@ -1,4 +1,4 @@
-#include "LApp.hpp"
+#include "life.hpp"
 
 void LApp::Event(SDL_Event *Event)
 {

@@ -4,12 +4,12 @@
 #include <SDL/SDL.h>
 #include <GL/glew.h>
 #include <SDL/SDL_ttf.h>
-#include "LMatrix.hpp"
-#include "Shader.hpp"
+#include "matrix.hpp"
+#include "shader.hpp"
 #include <iostream>
 #include <string>
 #include <math.h>
-#include "Automaton.hpp"
+#include "automaton.hpp"
 
 enum FontSize {size24, size16};
 

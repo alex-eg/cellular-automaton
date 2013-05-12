@@ -17,11 +17,14 @@ all: $(BINPATH)/life
 debug: CFLAGS += -ggdb
 debug: all
 
-$(BINPATH)/%.o: $(SRCPATH)/%.cpp $(DEPS)
+$(BINPATH)/%.o: $(SRCPATH)/%.cpp $(DEPS) | $(BINPATH)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 $(BINPATH)/life: $(OBJ)
 	$(CC) $^ -o $@ $(LIBS)
+
+$(BINPATH):
+	mkdir -p $(BINPATH)
 
 clean:
 	rm -f $(SRCPATH)/*~ $(INCPATH)/*~ $(BINPATH)/*.o

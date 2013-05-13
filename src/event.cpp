@@ -33,38 +33,6 @@ void LApp::HelpKeyDown(SDLKey sym, SDLMod mod, Uint16 unicode)
     }
 }
 
-void LApp::Event_Field(SDL_Event *Event)
-{
-    switch (Event->type) {
-    case SDL_KEYDOWN: {
-        KeyDown(Event->key.keysym.sym,Event->key.keysym.mod,Event->key.keysym.unicode);
-        break;
-    }
-    case SDL_KEYUP: {
-        KeyUp(Event->key.keysym.sym,Event->key.keysym.mod,Event->key.keysym.unicode);
-        break;
-    }
-    case SDL_QUIT: {
-        running = false;
-        break;
-    }
-    case SDL_MOUSEBUTTONDOWN: {
-	MouseButtonDown(Event->button.button, Event->button.x, Event->button.y);
-	break;
-    }
-    case SDL_MOUSEMOTION: {
-	bool Left, Right, Middle;
-	Left = SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(1);
-	Middle = SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(2);
-	Right = SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(3);
-	MouseMove(Event->motion.x, Event->motion.y, Event->motion.xrel, Event->motion.yrel, Left, Right, Middle);
-	break;
-    }
-    default:
-        break;
-    }
-}
-
 void LApp::KeyDown(SDLKey sym, SDLMod mod, Uint16 unicode)
 {
     switch (sym) {

@@ -1,3 +1,6 @@
+#ifndef LLIFE
+#define LLIFE
+
 #include <SDL/SDL.h>
 #include "automaton.hpp"
 #include "graphics.hpp"
@@ -56,3 +59,5 @@ class LApp {
 };
 
 inline void CatchErrorOpengl(int l);
+
+#endif

@@ -1,3 +1,6 @@
 *.o
 *~
 life
+life.exe
+parser_test
+parser_test.exe

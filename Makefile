@@ -29,4 +29,7 @@ $(BINPATH):
 clean:
 	rm -f $(SRCPATH)/*~ $(INCPATH)/*~ $(BINPATH)/*.o
 
+parser_test: $(SRCPATH)/parsertest.cpp $(SRCPATH)/parser.cpp
+	$(CC) -o $@ $^ $(CFLAGS)
+
 .PHONY: clean

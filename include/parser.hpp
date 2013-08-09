@@ -5,16 +5,19 @@
 #include <fstream>
 #include <string>
 #include <map>
+#include <algorithm>
 
 typedef std::map <std::string, std::string> KeyValueStorage;
 
 class Settings {
 private:
-    std::map <std::string, KeyValueStorage> Sections;
+    std::map <std::string, KeyValueStorage> sections;
 public:
     void AddToSection(std::string section_name, std::string key, std::string value);
-    void SearchInSection(std::string item, std::string section = std::string(""));
+    std::string Find(std::string item, std::string section = std::string(""));
     void Clear();
+    KeyValueStorage& operator[](std::string section_name);
+    Settings& operator=(const Settings &right);
     
     Settings() {}
     ~Settings() {}
@@ -24,7 +27,7 @@ public:
 class Parser {
 private:
 public:
-    void Parse(std::string filename);
+    Settings Parse(std::string filename);
     Parser() {}
     ~Parser() {}
     

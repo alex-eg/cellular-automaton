@@ -7,12 +7,8 @@ struct BoardSize {
     unsigned int y;
 };
 
-// struct Settings {
-//     void v;
-// };
-
 class LApp {
- private:
+private:
     bool running;
     bool updating, updatingstep;
     int update_counter;
@@ -27,7 +23,7 @@ class LApp {
 
     inline void __Init__(void);
     std::string rule;
- public:
+public:
     LApp();
     LApp(unsigned int x, unsigned int y, std::string r);
 

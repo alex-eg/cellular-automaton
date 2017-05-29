@@ -1,8 +1,12 @@
+#include <algorithm>
+#include <iostream>
+#include <fstream>
+
 #include "parser.hpp"
 
 void Settings::AddToSection(std::string sec_name, std::string key, std::string value)
 {
-    sections[sec_name][key] = value;       
+    sections[sec_name][key] = value;
 }
 
 std::string Settings::Find(std::string item, std::string section)
@@ -41,7 +45,7 @@ Settings Parser::Parse(std::string filename)
     Settings settings;
     if (!inifile) std::cerr << "Cannot open file " << filename << std::endl;
     while (!inifile.eof()) {
-        std::getline(inifile, line); 
+        std::getline(inifile, line);
         if (!line.length()) continue;
         if (line[0] == '#') continue;
         if (line[0] == ';') continue;
@@ -59,4 +63,3 @@ Settings Parser::Parse(std::string filename)
     inifile.close();
     return settings;
 }
-

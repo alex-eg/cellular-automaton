@@ -1,35 +1,27 @@
 CC = g++
-CFLAGS = -std=c++0x -Wall -O2 -I$(INCPATH)
+CFLAGS = -std=c++11 -Wall -O2
 LIBS = -lSDL -lGL -lGLEW -lSDL_ttf
-
-BINPATH = ./bin
-SRCPATH = ./src
-INCPATH = ./include
 
 MODULES = main life graphics event automaton shader
 
-DEPS = $(INCPATH)/*.hpp Makefile
-OBJ = $(MODULES:%=$(BINPATH)/%.o)
+DEPS = *.hpp Makefile
+OBJ = $(MODULES:%=%.o)
 
-all: $(BINPATH)/life
-	cp $< ./
+all: life
 
 debug: CFLAGS += -ggdb
 debug: all
 
-$(BINPATH)/%.o: $(SRCPATH)/%.cpp $(DEPS) | $(BINPATH)
+%.o: %.cpp $(DEPS) | $(BINPATH)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-$(BINPATH)/life: $(OBJ)
+life: $(OBJ)
 	$(CC) $^ -o $@ $(LIBS)
 
-$(BINPATH):
-	mkdir -p $(BINPATH)
-
 clean:
-	rm -f $(SRCPATH)/*~ $(INCPATH)/*~ $(BINPATH)/*.o
+	rm -f *~ *.o life
 
-parser_test: $(SRCPATH)/parsertest.cpp $(SRCPATH)/parser.cpp
+parser_test: parsertest.cpp parser.cpp
 	$(CC) -o $@ $^ $(CFLAGS)
 
 .PHONY: clean

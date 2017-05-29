@@ -1,11 +1,7 @@
-#ifndef _L_PARSER
-#define _L_PARSER
+#pragma once
 
-#include <iostream>
-#include <fstream>
 #include <string>
 #include <map>
-#include <algorithm>
 
 typedef std::map <std::string, std::string> KeyValueStorage;
 
@@ -18,10 +14,9 @@ public:
     void Clear();
     KeyValueStorage& operator[](std::string section_name);
     Settings& operator=(const Settings &right);
-    
+
     Settings() {}
     ~Settings() {}
-
 };
 
 class Parser {
@@ -30,7 +25,4 @@ public:
     Settings Parse(std::string filename);
     Parser() {}
     ~Parser() {}
-    
 };
-
-#endif

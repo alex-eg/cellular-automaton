@@ -33,12 +33,12 @@ int LApp::Execute()
 {
     if(!Init()) return -1;
     SDL_Event event;
-    
+
     while (running) {
-	while (SDL_PollEvent(&event)) Event(&event);
-	Loop();
-	Render();
-	SDL_Delay(1);
+        while (SDL_PollEvent(&event)) Event(&event);
+        Loop();
+        Render();
+        SDL_Delay(1);
     }
     Clean();
     return 0;
@@ -47,27 +47,27 @@ int LApp::Execute()
 bool LApp::Init()
 {
     size_t found;
-    
+
     graphics.grid = Grid(Board.x, Board.y, 10);
     life = Automaton(Board.x, Board.y);
-    
+
     AutomatonState dead = AutomatonState(0, 0.0, 0.0, 0.0, "dead");
     AutomatonState live = AutomatonState(1, 0.3, 0.8765, 0.3, "live");
-    
+
     std::map <statecode, Set<int>> born_req;
     Set <int> born_req_count;
 
     found = rule.find("/");
     if (found == std::string::npos) return false;
     for (size_t i = found+1; i<rule.length(); i++)
-	born_req_count.add((int)(rule[i]-48));
+        born_req_count.add((int)(rule[i]-48));
     born_req[live.code] = born_req_count;
-    
+
     std::map <statecode, Set<int>> surv_req;
     Set <int> surv_req_count;
 
     for (size_t i = 0; i<found; i++)
-	surv_req_count.add((int)(rule[i]-48));
+        surv_req_count.add((int)(rule[i]-48));
     surv_req[live.code] = surv_req_count;
 
     AutomatonTransition born = AutomatonTransition(live.code, dead.code, born_req, "born");
@@ -134,30 +134,30 @@ void LApp::Render_Help()
 void LApp::Render_Field()
 {
 
-    glClear(GL_COLOR_BUFFER_BIT); 
+    glClear(GL_COLOR_BUFFER_BIT);
 
     glPushMatrix();
     glTranslatef(graphics.dx, graphics.dy, 0.0);
 
     graphics.grid.DrawWithMap(life);
     graphics.grid.DrawBorder();
-    
+
     if (graphics.grid.cellsize > 22) graphics.grid.Draw();
 
     glPopMatrix();
-    
+
     if (!updating) {
-	HUD::glEnable2D();
-	glEnable(GL_BLEND);
+        HUD::glEnable2D();
+        glEnable(GL_BLEND);
 
-	SDL_Rect position;
-	SDL_Color color = {255, 255, 255};
-	position.x = 10;
-	position.y = 760;
-	graphics.hud.RenderText("Пауза", &position, &color, size24);
+        SDL_Rect position;
+        SDL_Color color = {255, 255, 255};
+        position.x = 10;
+        position.y = 760;
+        graphics.hud.RenderText("Пауза", &position, &color, size24);
 
-	glDisable(GL_BLEND);
-	HUD::glDisable2D();	
+        glDisable(GL_BLEND);
+        HUD::glDisable2D();
     }
 
     glPushMatrix();
@@ -177,7 +177,7 @@ void LApp::Render_Field()
     SDL_Color color = {255, 255, 255};
 
     char buff[64];
-   
+
     position.x = 10;
     position.y = 0;
     graphics.hud.RenderText(("Правило: "+rule).c_str(), &position, &color, size16);
@@ -187,7 +187,7 @@ void LApp::Render_Field()
     position.x = 500;
     sprintf(buff, "Неактивных: %d", life.StateCount[0]);
     graphics.hud.RenderText( buff, &position, &color, size16);
-    
+
     HUD::glDisable2D();
 
     SDL_GL_SwapBuffers();
@@ -202,8 +202,8 @@ void LApp::Loop()
 
     if (updating) counter++;
     if (counter > speed) {
-	life.Update();
-	counter = 0;
+        life.Update();
+        counter = 0;
     }
 }
 
@@ -211,7 +211,7 @@ void LApp::Clean()
 {
     glFinish();
     if (graphics.fbo != 0)
-	glDeleteFramebuffers(1, &graphics.fbo);
+        glDeleteFramebuffers(1, &graphics.fbo);
     TTF_CloseFont(graphics.hud.font16);
     TTF_CloseFont(graphics.hud.font24);
     TTF_Quit();
@@ -220,10 +220,10 @@ void LApp::Clean()
     std::cout<<"Clean normal, exitting\n";
 }
 
-/* ---------------------------------------------  */
+/* --------------------------------------------- */
 inline void CatchErrorOpengl(int l)
 {
     GLenum errCode;
     if ((errCode = glGetError()) != GL_NO_ERROR)
-	std::cout<<"Opengl error "<<errCode<<" on line "<<l - 1<<std::endl;
+    std::cout<<"Opengl error "<<errCode<<" on line "<<l - 1<<std::endl;
 }

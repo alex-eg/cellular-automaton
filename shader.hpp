@@ -1,5 +1,4 @@
-#ifndef _L_SHADER
-#define _L_SHADER 
+#pragma once
 
 #include <iostream>
 #include <fstream>
@@ -16,13 +15,13 @@ private:
 public:
     GLuint ShaderProgram;
     bool Running;
-    Shader() 
+    Shader()
     {
-	FragmentShader = 0;
-	VertexShader = 0;
-	ShaderProgram = 0;
-	Ready = false;
-	Running = false;
+    FragmentShader = 0;
+    VertexShader = 0;
+    ShaderProgram = 0;
+    Ready = false;
+    Running = false;
     }
 
     void Begin();
@@ -41,17 +40,15 @@ public:
     DefaultShader() {}
     DefaultShader &operator = (const DefaultShader &right)
     {
-	if (this == &right) return *this;
-	width = right.width;
-	height = right.height;
-	return *this;
+    if (this == &right) return *this;
+    width = right.width;
+    height = right.height;
+    return *this;
     }
 
     void Invoke(void)
     {
-	int uniform_WindowSize = glGetUniformLocation(ShaderProgram,"WindowSize");
-    	glUniform2f(uniform_WindowSize, width, height);
+    int uniform_WindowSize = glGetUniformLocation(ShaderProgram,"WindowSize");
+        glUniform2f(uniform_WindowSize, width, height);
     }
 };
-
-#endif

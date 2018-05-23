@@ -1,5 +1,0 @@
-TODO:
-
-    1. Move settings into .ini file
-    2. Rewrite LLife class to store cells in more useful structure
-    3. Implement bloom shader

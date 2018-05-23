@@ -1,0 +1,15 @@
+language: cpp
+compiler:
+    - clang
+
+script: make
+
+sudo: false
+addons:
+  apt:
+    update: true
+    packages:
+     - libgl1-mesa-dev
+     - libgles2-mesa-dev
+     - libsdl-dev
+     - libsdl-ttf-dev

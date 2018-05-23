@@ -12,4 +12,4 @@ addons:
      - libgl1-mesa-dev
      - libgles2-mesa-dev
      - libsdl-dev
-     - libsdl-ttf-dev
+     - libsdl-ttf2.0-dev

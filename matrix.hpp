@@ -10,15 +10,18 @@ public:
     T *field;
 
     LMatrix &operator = (const LMatrix &right) {
-        if (this == &right)
+        if (this == &right) {
             return *this;
+}
         delete [] field;
         width = right.width;
         height = right.height;
         field = new T [height*width];
-        for (u32 i=0; i<height; i++)
-            for (u32 j=0; j<width; j++)
+        for (u32 i=0; i<height; i++) {
+            for (u32 j=0; j<width; j++) {
                 field[i*height+j] = right.field[i*height+j];
+}
+}
         return *this;
     }
 
@@ -35,9 +38,11 @@ public:
         width = right.width;
         height = right.height;
         field = new T [height*width];
-        for (int i=0; i<height; i++)
-            for (int j=0; j<width; j++)
+        for (int i=0; i<height; i++) {
+            for (int j=0; j<width; j++) {
                 field(i,j) = right.field(i,j);
+}
+}
     }
 
     ~LMatrix() {

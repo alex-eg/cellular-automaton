@@ -33,14 +33,15 @@ public:
         lifespan = l;
     }
 
-    f64 *GetColor(void) {
+    f64 *get_color(void) {
         return color;
     }
 
     AutomatonState(const AutomatonState &other) = default;
     AutomatonState &operator = (const AutomatonState &right) {
-        if (this == &right)
+        if (this == &right) {
             return *this;
+}
         name = right.name;
         color[0] = right.color[0];
         color[1] = right.color[1];
@@ -70,8 +71,9 @@ public:
 
     AutomatonTransition(const AutomatonTransition &right) = default;
     AutomatonTransition &operator = (const AutomatonTransition &right) {
-        if (this == &right)
+        if (this == &right) {
             return *this;
+}
         name = right.name;
         requirements = right.requirements;
         met_code = right.met_code;
@@ -85,11 +87,13 @@ public:
         for (; it != requirements.end(); it++) {
             statecode req_code =(*it).first;
             int neighbour_count = (*neighbours.find(req_code)).second;
-            if ( !(*it).second.in(neighbour_count) ) r_met = false;
+            if ( !(*it).second.in(neighbour_count) ) { r_met = false;
+}
         }
 
-        if (r_met) return met_code;
-        else return unmet_code;
+        if (r_met) { return met_code;
+        } else { return unmet_code;
+}
     }
 };
 
@@ -99,11 +103,11 @@ private:
     LMatrix <statecode> field1;
     LMatrix <statecode> field2;
     LMatrix <statecode> *back;
-    std::map <statecode, int> Neighbours(u32 x, u32 y);
+    std::map <statecode, int> neighbours(u32 x, u32 y);
 public:
-    std::map <statecode, AutomatonTransition> Transition;
-    std::map <statecode, AutomatonState> State;
-    std::map <statecode, u32> StateCount;
+    std::map <statecode, AutomatonTransition> transition;
+    std::map <statecode, AutomatonState> state;
+    std::map <statecode, u32> state_count;
     LMatrix <statecode> *front;
 
     Automaton() {
@@ -126,30 +130,31 @@ public:
                 field1(i,j) = field2(i,j) = 0;
             }
         }
-        StateCount[0] = width*height;
+        state_count[0] = width*height;
     }
 
     Automaton &operator=(const Automaton &right) {
-        if (this == &right)
+        if (this == &right) {
             return *this;
+}
         width = right.width;
         height = right.height;
 
         field1 = right.field1;
         field2 = right.field2;
 
-        Transition = right.Transition;
-        State = right.State;
-        StateCount = right.StateCount;
+        transition = right.transition;
+        state = right.state;
+        state_count = right.state_count;
         front = &field1;
         back = &field2;
         return *this;
     }
 
-    void AddState(AutomatonState s, AutomatonTransition t);
-    void Clear();
-    void Update();
-    void Draw(int x, int y, statecode val);
-    void Randomize();
+    void add_state(AutomatonState s, AutomatonTransition t);
+    void clear();
+    void update();
+    void draw(int x, int y, statecode val);
+    void randomize();
 };
 } // namespace ca

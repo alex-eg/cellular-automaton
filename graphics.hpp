@@ -21,32 +21,33 @@ enum FontSize {size24, size16};
 class Grid {
 private:
     u32 height, width;
-    inline void FillCell(u32 x, u32 y, f64 *color);
+    inline void fill_cell(u32 x, u32 y, f64 *color);
 public:
     Grid() {}
     u32 cellsize;
     Grid(u32 h, u32 w, u32 cllsz) : height(h), width(w), cellsize(cllsz) {}
 
     Grid &operator = (const Grid &right) {
-        if (this == &right)
+        if (this == &right) {
             return *this;
+}
         width = right.width;
         height = right.height;
         cellsize = right.cellsize;
         return *this;
     }
 
-    u32 GetHeight() {
+    u32 get_height() {
         return height;
     }
 
-    u32 GetWidth() {
+    u32 get_width() {
         return width;
     }
 
-    void Draw();
-    void DrawWithMap(Automaton &M);
-    void DrawBorder();
+    void draw();
+    void draw_with_map(Automaton &m);
+    void draw_border();
 };
 
 struct RelativePosition {
@@ -59,18 +60,21 @@ public:
     TTF_Font *font24 = nullptr;
     TTF_Font *font16 = nullptr;
 
-    bool Init();
-    void RenderText(const char *text, SDL_Rect *location, SDL_Color *color, enum FontSize s);
-    static void glEnable2D();
-    static void glDisable2D();
+    bool init();
+    void render_text(const char *text, SDL_Rect *location, SDL_Color *color, enum FontSize s);
+    static void gl_enable2_d();
+    static void gl_disable2_d();
 
     HUD &operator = (const HUD &right) {
-        if (this == &right)
+        if (this == &right) {
             return *this;
-        if (font24 != nullptr) TTF_CloseFont(font24);
+}
+        if (font24 != nullptr) { TTF_CloseFont(font24);
+}
         font16 = right.font16;
 
-        if (font16 != nullptr) TTF_CloseFont(font16);
+        if (font16 != nullptr) { TTF_CloseFont(font16);
+}
         font16 = right.font16;
 
         return *this;
@@ -85,14 +89,14 @@ public:
     GLuint fbo, bloom_texture;
     Grid grid;
     SDL_Surface *display;
-    DefaultShader Shade;
-    Shader Bloom;
-    struct RelativePosition SDL_OGL;
+    DefaultShader shade;
+    Shader bloom;
+    struct RelativePosition sdl_ogl;
     HUD hud;
 
     Graphics() {
         display = nullptr;
-        SDL_OGL.x = SDL_OGL.y = 0.375;
+        sdl_ogl.x = sdl_ogl.y = 0.375;
         fbo = 0;
         bloom_texture = 0;
         width = height = 800;
@@ -100,19 +104,21 @@ public:
 
     Graphics(u32 w, u32 h) : width(w), height(h) {
         display = nullptr;
-        SDL_OGL.x = 0.375;
-        SDL_OGL.y = 0.375;
+        sdl_ogl.x = 0.375;
+        sdl_ogl.y = 0.375;
         fbo = 0;
         bloom_texture = 0;
     }
 
     Graphics &operator = (const Graphics &right) {
-        if (this == &right)
+        if (this == &right) {
             return *this;
-        if (display != nullptr) SDL_FreeSurface(display);
+}
+        if (display != nullptr) { SDL_FreeSurface(display);
+}
         display = right.display;
-        SDL_OGL.x = right.SDL_OGL.x;
-        SDL_OGL.y = right.SDL_OGL.y;
+        sdl_ogl.x = right.sdl_ogl.x;
+        sdl_ogl.y = right.sdl_ogl.y;
         fbo = right.fbo;
         bloom_texture = right.bloom_texture;
         width = right.width;
@@ -121,7 +127,7 @@ public:
 
     }
     ~Graphics() {}
-    bool Init();
+    bool init();
     static i32 nextpoweroftwo(i32 x);
 };
 } // namespace ca

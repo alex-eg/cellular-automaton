@@ -11,28 +11,28 @@
 namespace ca {
 class Shader {
 private:
-    GLuint FragmentShader, VertexShader;
-    bool Ready;
-    u32 FileLength(std::ifstream &file);
-    int LoadShader(const char* filename, GLchar **ShaderSource, u32 &len);
+    GLuint fragment_shader, vertex_shader;
+    bool ready;
+    u32 file_length(std::ifstream &file);
+    int load_shader(const char* filename, GLchar **shader_source, u32 &len);
 public:
-    GLuint ShaderProgram;
-    bool Running;
+    GLuint shader_program;
+    bool running;
     Shader()
     {
-    FragmentShader = 0;
-    VertexShader = 0;
-    ShaderProgram = 0;
-    Ready = false;
-    Running = false;
+    fragment_shader = 0;
+    vertex_shader = 0;
+    shader_program = 0;
+    ready = false;
+    running = false;
     }
 
-    void Begin();
+    void begin();
     void Switch();
-    void End();
-    bool LoadVertexShader(const std::string filename);
-    bool LoadFragmentShader(const std::string filename);
-    bool Compile();
+    void end();
+    bool load_vertex_shader(const std::string filename);
+    bool load_fragment_shader(const std::string filename);
+    bool compile();
 };
 
 class DefaultShader : public Shader {
@@ -43,16 +43,17 @@ public:
     DefaultShader() {}
     DefaultShader &operator = (const DefaultShader &right)
     {
-    if (this == &right) return *this;
+    if (this == &right) { return *this;
+}
     width = right.width;
     height = right.height;
     return *this;
     }
 
-    void Invoke(void) {
-        i32 uniform_WindowSize =
-            glGetUniformLocation(ShaderProgram, "WindowSize");
-        glUniform2f(uniform_WindowSize, static_cast<GLfloat>(width),
+    void invoke(void) {
+        i32 uniform_window_size =
+            glGetUniformLocation(shader_program, "WindowSize");
+        glUniform2f(uniform_window_size, static_cast<GLfloat>(width),
                     static_cast<GLfloat>(height));
     }
 };

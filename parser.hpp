@@ -9,9 +9,9 @@ class Settings {
 private:
     std::map <std::string, KeyValueStorage> sections;
 public:
-    void AddToSection(std::string section_name, std::string key, std::string value);
-    std::string Find(std::string item, std::string section = std::string(""));
-    void Clear();
+    void add_to_section(std::string section_name, std::string key, std::string value);
+    std::string find(std::string item, std::string section = std::string(""));
+    void clear();
     KeyValueStorage& operator[](std::string section_name);
     Settings& operator=(const Settings &right);
 
@@ -22,7 +22,7 @@ public:
 class Parser {
 private:
 public:
-    Settings Parse(std::string filename);
+    Settings parse(std::string filename);
     Parser() {}
     ~Parser() {}
 };

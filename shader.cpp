@@ -1,120 +1,138 @@
 #include "shader.hpp"
 
 namespace ca {
-u32 Shader::FileLength(std::ifstream &file)
-{
-    if(!file.good()) return 0;
+u32 Shader::file_length(std::ifstream &file) {
+    if (!file.good()) {
+        return 0;
+    }
 
-    file.seekg(0,std::ios::end);
+    file.seekg(0, std::ios::end);
     long len = file.tellg();
     file.seekg(std::ios::beg);
 
     return static_cast<u32>(len);
 }
 
-int Shader::LoadShader(const char* filename, GLchar **ShaderSource, u32 &len)
-{
+int Shader::load_shader(const char *filename, GLchar **shader_source, u32 &len) {
     std::ifstream file;
 
     file.open(filename, std::ios::in);
-    if(!file) return -1;
-    len = FileLength(file);
-    if (len == 0) return -2;
-    *ShaderSource = new char[len+1];
-    if (ShaderSource == nullptr) return -3;
-
-    (*ShaderSource)[len] = '\0';
-
-    u32 i=0;
-
-    while (file.good()) {
-    (*ShaderSource)[i] = static_cast<GLchar>(file.get());
-    if (!file.eof()) i++;
+    if (!file) {
+        return -1;
+    }
+    len = file_length(file);
+    if (len == 0) {
+        return -2;
+    }
+    *shader_source = new char[len + 1];
+    if (shader_source == nullptr) {
+        return -3;
     }
 
-    (*ShaderSource)[i] = '\0';
+    (*shader_source)[len] = '\0';
+
+    u32 i = 0;
+
+    while (file.good()) {
+        (*shader_source)[i] = static_cast<GLchar>(file.get());
+        if (!file.eof()) {
+            i++;
+        }
+    }
+
+    (*shader_source)[i] = '\0';
 
     file.close();
 
     return 0;
 }
 
-bool Shader::LoadVertexShader(const std::string filename)
-{
+bool Shader::load_vertex_shader(const std::string filename) {
     GLchar *ssource;
     u32 slen;
 
-    int ret = LoadShader(filename.c_str(), &ssource, slen);
-    if (ret!=0) return false;
+    int ret = load_shader(filename.c_str(), &ssource, slen);
+    if (ret != 0) {
+        return false;
+    }
 
-    VertexShader = glCreateShaderObjectARB(GL_VERTEX_SHADER);
+    vertex_shader = glCreateShaderObjectARB(GL_VERTEX_SHADER);
 
     const GLchar *c_ssource = ssource;
     const GLint c_len = static_cast<GLint>(slen);
-    glShaderSourceARB(VertexShader, 1, &c_ssource, &c_len);
-    glCompileShaderARB(VertexShader);
+    glShaderSourceARB(vertex_shader, 1, &c_ssource, &c_len);
+    glCompileShaderARB(vertex_shader);
 
     int compiled = 0;
-    glGetObjectParameterivARB(VertexShader, GL_COMPILE_STATUS, &compiled);
-    if (!compiled) return false;
+    glGetObjectParameterivARB(vertex_shader, GL_COMPILE_STATUS, &compiled);
+    if (!compiled) {
+        return false;
+    }
 
     return true;
 }
 
-bool Shader::LoadFragmentShader(const std::string filename)
-{
+bool Shader::load_fragment_shader(const std::string filename) {
     GLchar *ssource;
     u32 slen;
 
-    int ret = LoadShader(filename.c_str(), &ssource, slen);
-    if (ret!=0) return false;
+    int ret = load_shader(filename.c_str(), &ssource, slen);
+    if (ret != 0) {
+        return false;
+    }
 
-    FragmentShader = glCreateShaderObjectARB(GL_FRAGMENT_SHADER);
+    fragment_shader = glCreateShaderObjectARB(GL_FRAGMENT_SHADER);
 
     const GLchar *c_ssource = ssource;
     const GLint c_len = static_cast<GLint>(slen);
-    glShaderSourceARB(FragmentShader, 1, &c_ssource, &c_len);
-    glCompileShaderARB(FragmentShader);
+    glShaderSourceARB(fragment_shader, 1, &c_ssource, &c_len);
+    glCompileShaderARB(fragment_shader);
 
     int compiled = 0;
-    glGetObjectParameterivARB(FragmentShader, GL_COMPILE_STATUS, &compiled);
-    if (!compiled) return false;
+    glGetObjectParameterivARB(fragment_shader, GL_COMPILE_STATUS, &compiled);
+    if (!compiled) {
+        return false;
+    }
 
     return true;
 }
 
-bool Shader::Compile()
-{
-    ShaderProgram = glCreateProgram();
-    if (VertexShader) glAttachShader(ShaderProgram, VertexShader);
-    if (FragmentShader) glAttachShader(ShaderProgram, FragmentShader);
-    glLinkProgram(ShaderProgram);
+bool Shader::compile() {
+    shader_program = glCreateProgram();
+    if (vertex_shader) {
+        glAttachShader(shader_program, vertex_shader);
+    }
+    if (fragment_shader) {
+        glAttachShader(shader_program, fragment_shader);
+    }
+    glLinkProgram(shader_program);
 
     GLint linked;
-    glGetProgramiv(ShaderProgram, GL_LINK_STATUS, &linked);
-    if (!linked) return false;
-    Ready = true;
+    glGetProgramiv(shader_program, GL_LINK_STATUS, &linked);
+    if (!linked) {
+        return false;
+    }
+    ready = true;
     return true;
 }
 
-void Shader::Begin()
-{
-    if (Ready) {
-    glUseProgram(ShaderProgram);
-    Running = true;
+void Shader::begin() {
+    if (ready) {
+        glUseProgram(shader_program);
+        running = true;
     }
 }
 
-void Shader::End()
-{
+void Shader::end() {
     glUseProgram(0);
-    Running = false;
+    running = false;
 }
 
 void Shader::Switch() {
-    if (Running)
-        End();
-    else
-        Begin();
+    if (running) {
+        end();
+    } else {
+        begin();
+    }
 }
 } // namespace ca

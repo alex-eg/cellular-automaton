@@ -3,15 +3,14 @@
 template <class T> class Set {
 protected:
     T cont[8];
-    unsigned char size;
+    unsigned char size = 0;
 public:
-    Set() {
-        size = 0;
-    }
+    Set() = default;
 
     void add(T val);
     bool in(T val);
     bool del(T val);
+    Set(const Set &right) = default;
     Set &operator = (const Set &right) {
         if (this == &right)
             return *this;

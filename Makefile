@@ -1,6 +1,6 @@
 CC = clang++
-CFLAGS = -std=c++17 -Weverything -O2 -Werror -pedantic-errors -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-padded
-LIBS = -lSDL2 -lGL -lGLEW -lSDL2_ttf
+CFLAGS = -std=c++20 -Weverything -Werror -pedantic-errors -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-padded
+LIBS = -lSDL -lGL -lGLEW -lSDL_ttf
 
 MODULES = main life graphics event automaton shader
 
@@ -9,10 +9,11 @@ OBJ = $(MODULES:%=bin/%.o)
 
 BINPATH = ./bin
 
+all: CFLAGS += -O2
 all: life
 
 debug: CFLAGS += -ggdb
-debug: all
+debug: life
 
 $(BINPATH):
 	mkdir -p $(BINPATH)
@@ -29,4 +30,7 @@ clean:
 parser_test: parsertest.cpp parser.cpp
 	$(CC) -o $@ $^ $(CFLAGS)
 
-.PHONY: clean
+format-all:
+	echo *.hpp *.cpp | xargs clang-format --dry-run
+
+.PHONY: clean format-all

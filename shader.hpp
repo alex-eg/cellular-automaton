@@ -49,6 +49,6 @@ public:
     void Invoke(void)
     {
     int uniform_WindowSize = glGetUniformLocation(ShaderProgram,"WindowSize");
-        glUniform2f(uniform_WindowSize, width, height);
+        glUniform2f(uniform_WindowSize, static_cast<GLfloat>(width), static_cast<GLfloat>(height));
     }
 };

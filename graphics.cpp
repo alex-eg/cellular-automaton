@@ -5,63 +5,64 @@ void Grid::DrawBorder()
     glColor3f(0.5, 0.5, 0.5);
     glBegin(GL_LINES);
     glVertex2f(0, 0);
-    glVertex2f(0, (cellsize+1)*height+1);
+    glVertex2f(0, static_cast<GLfloat>((cellsize+1)*height+1));
     glEnd();
 
     glBegin(GL_LINES);
-    glVertex2f((cellsize+1)*width, 0);
-    glVertex2f((cellsize+1)*width, (cellsize+1)*height+1);
+    glVertex2f(static_cast<GLfloat>((cellsize+1)*width), 0);
+    glVertex2f(static_cast<GLfloat>((cellsize+1)*width), static_cast<GLfloat>((cellsize+1)*height+1));
     glEnd();
 
     glBegin(GL_LINES);
     glVertex2f(0, 0);
-    glVertex2f((cellsize+1)*width, 0);
+    glVertex2f(static_cast<GLfloat>((cellsize+1)*width), 0);
     glEnd();
 
     glBegin(GL_LINES);
-    glVertex2f(0, (cellsize+1)*width);
-    glVertex2f((cellsize+1)*width, (cellsize+1)*width);
+    glVertex2f(0, static_cast<GLfloat>((cellsize+1)*width));
+    glVertex2f(static_cast<GLfloat>((cellsize+1)*width), static_cast<GLfloat>((cellsize+1)*width));
     glEnd();
 }
 
 void Grid::Draw()
 {
-    glColor3f(0.8, 0.8, 0.8);
-    for(int i = 1; i<=width; i++) {
-    if (i == width/2) glColor3f(0.2, 0.723, 0.32);
-    glBegin(GL_LINES);
-    glVertex2f(cellsize*i+i, 0);
-    glVertex2f(cellsize*i+i, (cellsize+1)*height);
-    glEnd();
-    if (i == width/2) glColor3f(0.8, 0.8, 0.8);
+    glColor3f(0.8f, 0.8f, 0.8f);
+    for(unsigned int i = 1; i<=width; i++) {
+        if (i == width/2) glColor3f(0.2f, 0.723f, 0.32f);
+        glBegin(GL_LINES);
+        glVertex2f(static_cast<GLfloat>(cellsize*i+i), 0);
+        glVertex2f(static_cast<GLfloat>(cellsize*i+i), static_cast<GLfloat>((cellsize+1)*height));
+        glEnd();
+        if (i == width/2) glColor3f(0.8f, 0.8f, 0.8f);
     }
-    for(int i = 1; i<=height; i++) {
-    if (i == height/2) glColor3f(0.2, 0.723, 0.32);
-    glBegin(GL_LINES);
-    glVertex2f(0, cellsize*i+i);
-    glVertex2f((cellsize+1)*width, cellsize*i+i);
-    glEnd();
-    if (i == width/2) glColor3f(0.8, 0.8, 0.8);
+    for(unsigned int i = 1; i<=height; i++) {
+        if (i == height/2) glColor3f(0.2f, 0.723f, 0.32f);
+        glBegin(GL_LINES);
+        glVertex2f(0, static_cast<GLfloat>(cellsize*i+i));
+        glVertex2f(static_cast<GLfloat>((cellsize+1)*width), static_cast<GLfloat>(cellsize*i+i));
+        glEnd();
+        if (i == width/2) glColor3f(0.8f, 0.8f, 0.8f);
     }
 }
 
 void Grid::DrawWithMap(Automaton &life)
 {
-    for (int i=0; i<height; i++)
-    for(int j=0; j<width; j++) {
-        statecode cell_state = life(i,j);
-        FillCell(i, j, life.State[cell_state].GetColor());
+    for (unsigned int i=0; i<height; i++) {
+        for(unsigned int j=0; j<width; j++) {
+            statecode cell_state = life(i,j);
+            FillCell(i, j, life.State[cell_state].GetColor());
+        }
     }
 }
 
-inline void Grid::FillCell(int x, int y, double *color)
+inline void Grid::FillCell(unsigned int x, unsigned int y, double *color)
 {
-    glColor3f(color[0], color[1], color[2]);
+    glColor3f(static_cast<GLfloat>(color[0]), static_cast<GLfloat>(color[1]), static_cast<GLfloat>(color[2]));
     glBegin(GL_QUADS);
-    glVertex2f((cellsize+1)*x+1, (cellsize+1)*y+1);
-    glVertex2f((cellsize+1)*x+cellsize+1, (cellsize+1)*y+1);
-    glVertex2f((cellsize+1)*x+cellsize+1, (cellsize+1)*y+cellsize+1);
-    glVertex2f((cellsize+1)*x+1, (cellsize+1)*y+cellsize+1);
+    glVertex2f(static_cast<GLfloat>((cellsize+1)*x+1), static_cast<GLfloat>((cellsize+1)*y+1));
+    glVertex2f(static_cast<GLfloat>((cellsize+1)*x+cellsize+1), static_cast<GLfloat>((cellsize+1)*y+1));
+    glVertex2f(static_cast<GLfloat>((cellsize+1)*x+cellsize+1), static_cast<GLfloat>((cellsize+1)*y+cellsize+1));
+    glVertex2f(static_cast<GLfloat>((cellsize+1)*x+1), static_cast<GLfloat>((cellsize+1)*y+cellsize+1));
     glEnd();
 }
 
@@ -79,14 +80,17 @@ bool Graphics::Init()
     SDL_GL_SetAttribute(SDL_GL_ACCUM_BLUE_SIZE,     8);
     SDL_GL_SetAttribute(SDL_GL_ACCUM_ALPHA_SIZE,    8);
 
-    if ((display = SDL_SetVideoMode(width, height, 32, SDL_HWSURFACE | SDL_DOUBLEBUF | SDL_OPENGL)) == NULL) return false;
+    if ((display = SDL_SetVideoMode(static_cast<int>(width), static_cast<int>(height), 32, SDL_HWSURFACE | SDL_DOUBLEBUF | SDL_OPENGL)) == nullptr)
+    {
+        return false;
+    }
 
     /* Load and init GLEW */
     glewExperimental = true;
     GLenum err = glewInit();
     if(err!=GLEW_OK) {
-    std::cout<<"glewInit failed, aborting."<<std::endl;
-    exit(1);
+        std::cout<<"glewInit failed, aborting."<<std::endl;
+        exit(1);
     }
 
     /* Load and compile shaders */
@@ -100,7 +104,7 @@ bool Graphics::Init()
     if (!Bloom.Compile()) std::cout<<"Failed compiling shader\n";
 
     /* Set OpenGL parameters */
-    glClearColor(0.07, 0.03, 0.05, 0.0);
+    glClearColor(0.07f, 0.03f, 0.05f, 0.0f);
 
     glBlendFunc(GL_ONE, GL_ONE);
 
@@ -113,7 +117,7 @@ bool Graphics::Init()
     dx = (width - grid.GetWidth() * grid.cellsize)/2;
     dy = (height - grid.GetHeight() * grid.cellsize)/2;
 
-    glTranslatef(0.375, 0.375, 0);
+    glTranslatef(0.375f, 0.375f, 0);
     uniform_tex0 = glGetUniformLocation(Bloom.ShaderProgram,"tex0");
 
     return hud.Init();
@@ -122,7 +126,7 @@ bool Graphics::Init()
 int Graphics::nextpoweroftwo(int x)
 {
     double logbase2 = log(x) / log(2);
-    return round(pow(2,ceil(logbase2)));
+    return static_cast<int>(round(pow(2,ceil(logbase2))));
 }
 
 /* Class HUD */
@@ -130,19 +134,19 @@ int Graphics::nextpoweroftwo(int x)
 bool HUD::Init(void)
 {
     if (TTF_Init() == -1) {
-    std::cout<<"TTF init failed\n";
-    return false;
+        std::cout<<"TTF init failed\n";
+        return false;
     }
     font24 = TTF_OpenFont("DejaVuSansMono.ttf", 24);
-    if (font24 == NULL ) {
-    std::cout<<"Loading font failed\n";
-    return false;
+    if (font24 == nullptr ) {
+        std::cout<<"Loading font failed\n";
+        return false;
     }
 
     font16 = TTF_OpenFont("DejaVuSansMono.ttf", 16);
-    if (font16 == NULL ) {
-    std::cout<<"Loading font failed\n";
-    return false;
+    if (font16 == nullptr ) {
+        std::cout<<"Loading font failed\n";
+        return false;
     }
 
     return true;
@@ -169,7 +173,7 @@ void HUD::RenderText(const char *text, SDL_Rect *location, SDL_Color *color, enu
                     0x000000ff,
                     0xff000000);
 
-    SDL_BlitSurface(initial, 0, intermediary, 0);
+    SDL_BlitSurface(initial, nullptr, intermediary, nullptr);
 
     /* Tell GL about our new texture */
     glGenTextures(1, &texture);
@@ -189,21 +193,21 @@ void HUD::RenderText(const char *text, SDL_Rect *location, SDL_Color *color, enu
     glBegin(GL_QUADS);
 
     glTexCoord2f(0.0f, 1.0f);
-    glVertex2f(location->x    , location->y);
+    glVertex2f(static_cast<GLfloat>(location->x), static_cast<GLfloat>(location->y));
     glTexCoord2f(1.0f, 1.0f);
-    glVertex2f(location->x + w, location->y);
+    glVertex2f(static_cast<GLfloat>(location->x + w), static_cast<GLfloat>(location->y));
     glTexCoord2f(1.0f, 0.0f);
-    glVertex2f(location->x + w, location->y + h);
+    glVertex2f(static_cast<GLfloat>(location->x + w), static_cast<GLfloat>(location->y + h));
     glTexCoord2f(0.0f, 0.0f);
-    glVertex2f(location->x    , location->y + h);
+    glVertex2f(static_cast<GLfloat>(location->x), static_cast<GLfloat>(location->y + h));
     glEnd();
 
     /* Bad things happen if we delete the texture before it finishes */
     glFinish();
 
     /* return the deltas in the unused w,h part of the rect */
-    location->w = initial->w;
-    location->h = initial->h;
+    location->w = static_cast<unsigned short>(initial->w);
+    location->h = static_cast<unsigned short>(initial->h);
 
     /* Clean up */
     SDL_FreeSurface(initial);

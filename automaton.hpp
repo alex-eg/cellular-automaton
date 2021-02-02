@@ -5,7 +5,7 @@
 #include <string>
 #include <map>
 
-typedef unsigned char statecode;
+using statecode = unsigned char;
 
 class AutomatonState {
 private:
@@ -36,6 +36,7 @@ public:
         return color;
     }
 
+    AutomatonState(const AutomatonState &other) = default;
     AutomatonState &operator = (const AutomatonState &right) {
         if (this == &right)
             return *this;
@@ -66,6 +67,7 @@ public:
         name = "Unnamed transition";
     }
 
+    AutomatonTransition(const AutomatonTransition &right) = default;
     AutomatonTransition &operator = (const AutomatonTransition &right) {
         if (this == &right)
             return *this;
@@ -92,39 +94,41 @@ public:
 
 class Automaton {
 private:
-    int width, height;
+    unsigned int width, height;
     LMatrix <statecode> field1;
     LMatrix <statecode> field2;
     LMatrix <statecode> *back;
-    std::map <statecode, int> Neighbours(int x, int y);
+    std::map <statecode, int> Neighbours(unsigned int x, unsigned int y);
 public:
     std::map <statecode, AutomatonTransition> Transition;
     std::map <statecode, AutomatonState> State;
-    std::map <statecode, int> StateCount;
+    std::map <statecode, unsigned int> StateCount;
     LMatrix <statecode> *front;
 
     Automaton() {
-        front = NULL;
-        back = NULL;
+        front = nullptr;
+        back = nullptr;
     }
 
-    statecode &operator () (int i, int j) {
+    statecode &operator () (unsigned int i, unsigned int j) {
         return (*front)(i,j);
     }
 
-    Automaton(int w, int h) : width(w), height(h) {
+    Automaton(unsigned int w, unsigned int h) : width(w), height(h) {
         field1 = LMatrix <statecode> (width, height);
         field2 = LMatrix <statecode> (width, height);
         front = &field1;
         back = &field2;
 
-        for (int i=0; i<height; i++)
-            for (int j=0; j<width; j++)
+        for (unsigned int i=0; i<height; ++i) {
+            for (unsigned int j=0; j<width; ++j) {
                 field1(i,j) = field2(i,j) = 0;
+            }
+        }
         StateCount[0] = width*height;
     }
 
-    Automaton &operator = (const Automaton &right) {
+    Automaton &operator=(const Automaton &right) {
         if (this == &right)
             return *this;
         width = right.width;

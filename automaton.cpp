@@ -3,10 +3,10 @@
 
 void Automaton::Update(void)
 {
-    for (int i=0; i<height; i++)
-    for (int j=0; j<width; j++) {
+    for (unsigned int i=0; i<height; i++)
+    for (unsigned int j=0; j<width; j++) {
         StateCount[(*front)(i,j)]--;
-        (*back)(i,j) = Transition[State[(*front)(i,j)].code](Neighbours(i,j));
+        (*back)(i,j) = Transition[State[(*front)(i,j)].code](Neighbours(i, j));
         StateCount[(*back)(i,j)]++;
     }
     LMatrix <statecode> *temp;
@@ -15,12 +15,12 @@ void Automaton::Update(void)
     back = temp;
 }
 
-std::map <statecode, int> Automaton::Neighbours(int x, int y)
+std::map <statecode, int> Automaton::Neighbours(unsigned int x, unsigned int y)
 {
     std::map <statecode, int> ret;
 
-    int cx[3] = {x-1, x, x+1};
-    int cy[3] = {y-1, y, y+1};
+    unsigned int cx[3] = {x-1, x, x+1};
+    unsigned int cy[3] = {y-1, y, y+1};
 
     if (x == 0) cx[0] = height -1;
     else if (x == height - 1) cx[2] = 0;
@@ -47,21 +47,23 @@ void Automaton::Draw(int x, int y, statecode val)
 
 void Automaton::Randomize()
 {
-    for (int i=0; i<height; i++)
-    for (int j=0; j<width; j++) {
-        StateCount[(*front)(i,j)]--;
-        (*front)(i,j) = rand() % 2;
-        StateCount[(*front)(i,j)]++;
+    for (unsigned int i=0; i<height; i++) {
+        for (unsigned int j=0; j<width; j++) {
+            StateCount[(*front)(i,j)]--;
+            (*front)(i,j) = rand() % 2;
+            StateCount[(*front)(i,j)]++;
+        }
     }
 }
 
 void Automaton::Clear()
 {
-    for (int i=0; i<height; i++)
-    for (int j=0; j<width; j++) {
+    for (unsigned int i=0; i<height; i++) {
+    for (unsigned int j=0; j<width; j++) {
         StateCount[1] = 0;
         (*front)(i,j) = 0;
         StateCount[0] = width*height;
+    }
     }
 }
 

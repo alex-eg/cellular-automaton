@@ -2,7 +2,7 @@
 
 template <typename T> class LMatrix {
 private:
-    int width, height;
+    unsigned int width, height;
 public:
     T *field;
 
@@ -13,17 +13,17 @@ public:
         width = right.width;
         height = right.height;
         field = new T [height*width];
-        for (int i=0; i<height; i++)
-            for (int j=0; j<width; j++)
+        for (unsigned int i=0; i<height; i++)
+            for (unsigned int j=0; j<width; j++)
                 field[i*height+j] = right.field[i*height+j];
         return *this;
     }
 
     LMatrix() {
-        field = 0;
+        field = nullptr;
     }
 
-    LMatrix(int h, int w) : width(w), height(h) {
+    LMatrix(unsigned int h, unsigned int w) : width(w), height(h) {
         field = new T [height*width];
     }
 
@@ -42,6 +42,10 @@ public:
     }
 
     T &operator () (int i, int j) {
+        return this->operator()(static_cast<unsigned int>(i), static_cast<unsigned int>(j));
+    }
+
+    T &operator () (unsigned int i, unsigned int j) {
         return field[i*height+j];
     }
 };

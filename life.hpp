@@ -16,7 +16,7 @@ private:
     Automaton life;
     bool nowDrawing;
     statecode whatDraw;
-    struct BoardSize Board;
+    BoardSize Board;
     Graphics graphics;
 
     bool help;

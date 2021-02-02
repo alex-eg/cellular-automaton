@@ -14,12 +14,12 @@ enum FontSize {size24, size16};
 
 class Grid {
 private:
-    int height, width;
-    inline void FillCell(int x, int y, double *color);
+    unsigned int height, width;
+    inline void FillCell(unsigned int x, unsigned int y, double *color);
 public:
     Grid() {}
-    int cellsize;
-    Grid(int h, int w, int cllsz) : height(h), width(w), cellsize(cllsz) {}
+    unsigned int cellsize;
+    Grid(unsigned int h, unsigned int w, unsigned int cllsz) : height(h), width(w), cellsize(cllsz) {}
 
     Grid &operator = (const Grid &right) {
         if (this == &right)
@@ -30,11 +30,11 @@ public:
         return *this;
     }
 
-    int GetHeight(void) {
+    unsigned int GetHeight() {
         return height;
     }
 
-    int GetWidth(void) {
+    unsigned int GetWidth() {
         return width;
     }
 
@@ -50,8 +50,8 @@ struct RelativePosition {
 
 class HUD {
 public:
-    TTF_Font *font24;
-    TTF_Font *font16;
+    TTF_Font *font24 = nullptr;
+    TTF_Font *font16 = nullptr;
 
     bool Init();
     void RenderText(const char *text, SDL_Rect *location, SDL_Color *color, enum FontSize s);
@@ -61,10 +61,10 @@ public:
     HUD &operator = (const HUD &right) {
         if (this == &right)
             return *this;
-        if (font24 != NULL) TTF_CloseFont(font24);
+        if (font24 != nullptr) TTF_CloseFont(font24);
         font16 = right.font16;
 
-        if (font16 != NULL) TTF_CloseFont(font16);
+        if (font16 != nullptr) TTF_CloseFont(font16);
         font16 = right.font16;
 
         return *this;
@@ -73,7 +73,7 @@ public:
 
 class Graphics {
 public:
-    int width, height; /* SDL window */
+    unsigned int width, height; /* SDL window */
     int uniform_tex0;
     double dx, dy; /* Scaling displacement */
     GLuint fbo, bloom_texture;
@@ -85,7 +85,7 @@ public:
     HUD hud;
 
     Graphics() {
-        display = NULL;
+        display = nullptr;
         SDL_OGL.x = SDL_OGL.y = 0.375;
         fbo = 0;
         bloom_texture = 0;
@@ -93,7 +93,7 @@ public:
     }
 
     Graphics(unsigned int w, unsigned int h) : width(w), height(h) {
-        display = NULL;
+        display = nullptr;
         SDL_OGL.x = 0.375;
         SDL_OGL.y = 0.375;
         fbo = 0;
@@ -103,7 +103,7 @@ public:
     Graphics &operator = (const Graphics &right) {
         if (this == &right)
             return *this;
-        if (display != NULL) SDL_FreeSurface(display);
+        if (display != nullptr) SDL_FreeSurface(display);
         display = right.display;
         SDL_OGL.x = right.SDL_OGL.x;
         SDL_OGL.y = right.SDL_OGL.y;

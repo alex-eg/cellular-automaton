@@ -60,14 +60,14 @@ bool LApp::Init()
     found = rule.find("/");
     if (found == std::string::npos) return false;
     for (size_t i = found+1; i<rule.length(); i++)
-        born_req_count.add((int)(rule[i]-48));
+        born_req_count.add(static_cast<int>(rule[i]-48));
     born_req[live.code] = born_req_count;
 
     std::map <statecode, Set<int>> surv_req;
     Set <int> surv_req_count;
 
     for (size_t i = 0; i<found; i++)
-        surv_req_count.add((int)(rule[i]-48));
+        surv_req_count.add(static_cast<int>(rule[i]-48));
     surv_req[live.code] = surv_req_count;
 
     AutomatonTransition born = AutomatonTransition(live.code, dead.code, born_req, "born");
@@ -92,7 +92,7 @@ void LApp::Render_Help()
     HUD::glEnable2D();
 
     SDL_Rect position;
-    SDL_Color color = { 255, 255, 255 };
+    SDL_Color color = { 255, 255, 255, 0 };
 
     glEnable(GL_BLEND);
 
@@ -137,7 +137,7 @@ void LApp::Render_Field()
     glClear(GL_COLOR_BUFFER_BIT);
 
     glPushMatrix();
-    glTranslatef(graphics.dx, graphics.dy, 0.0);
+    glTranslatef(static_cast<GLfloat>(graphics.dx), static_cast<GLfloat>(graphics.dy), 0.0);
 
     graphics.grid.DrawWithMap(life);
     graphics.grid.DrawBorder();
@@ -151,7 +151,7 @@ void LApp::Render_Field()
         glEnable(GL_BLEND);
 
         SDL_Rect position;
-        SDL_Color color = {255, 255, 255};
+        SDL_Color color = {255, 255, 255, 0};
         position.x = 10;
         position.y = 760;
         graphics.hud.RenderText("Пауза", &position, &color, size24);
@@ -164,8 +164,8 @@ void LApp::Render_Field()
     glLoadIdentity();
     glBegin(GL_QUADS);
     glColor3f(0.0, 0.0, 0.0);
-    glVertex2f(  0, 800);
-    glVertex2f(  0, 760);
+    glVertex2f(0, 800);
+    glVertex2f(0, 760);
     glVertex2f(800, 760);
     glVertex2f(800, 800);
     glEnd();
@@ -174,7 +174,7 @@ void LApp::Render_Field()
     HUD::glEnable2D();
 
     SDL_Rect position;
-    SDL_Color color = {255, 255, 255};
+    SDL_Color color = {255, 255, 255, 0};
 
     char buff[64];
 

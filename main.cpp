@@ -6,8 +6,8 @@ int main(int argc, char **argv)
     LApp Life(150, 150, "23/3");
     return Life.Execute();
     } else if (argc == 4) {
-    int x = atoi(argv[1]);
-    int y = atoi(argv[2]);
+    unsigned int x = static_cast<unsigned int>(atoi(argv[1]));
+    unsigned int y = static_cast<unsigned int>(atoi(argv[2]));
     LApp Life(x, y, argv[3]);
     return Life.Execute();
     } else {

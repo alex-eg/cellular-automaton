@@ -5,10 +5,10 @@ unsigned int Shader::FileLength(std::ifstream &file)
     if(!file.good()) return 0;
 
     file.seekg(0,std::ios::end);
-    unsigned int len = file.tellg();
+    long len = file.tellg();
     file.seekg(std::ios::beg);
 
-    return len;
+    return static_cast<unsigned int>(len);
 }
 
 int Shader::LoadShader(const char* filename, GLchar **ShaderSource, unsigned int &len)
@@ -20,14 +20,14 @@ int Shader::LoadShader(const char* filename, GLchar **ShaderSource, unsigned int
     len = FileLength(file);
     if (len == 0) return -2;
     *ShaderSource = new char[len+1];
-    if (ShaderSource == 0) return -3;
+    if (ShaderSource == nullptr) return -3;
 
     (*ShaderSource)[len] = '\0';
 
     unsigned int i=0;
 
     while (file.good()) {
-    (*ShaderSource)[i] = file.get();
+    (*ShaderSource)[i] = static_cast<GLchar>(file.get());
     if (!file.eof()) i++;
     }
 
@@ -49,7 +49,7 @@ bool Shader::LoadVertexShader(const std::string filename)
     VertexShader = glCreateShaderObjectARB(GL_VERTEX_SHADER);
 
     const GLchar *c_ssource = ssource;
-    const GLint c_len = slen;
+    const GLint c_len = static_cast<GLint>(slen);
     glShaderSourceARB(VertexShader, 1, &c_ssource, &c_len);
     glCompileShaderARB(VertexShader);
 
@@ -71,7 +71,7 @@ bool Shader::LoadFragmentShader(const std::string filename)
     FragmentShader = glCreateShaderObjectARB(GL_FRAGMENT_SHADER);
 
     const GLchar *c_ssource = ssource;
-    const GLint c_len = slen;
+    const GLint c_len = static_cast<GLint>(slen);
     glShaderSourceARB(FragmentShader, 1, &c_ssource, &c_len);
     glCompileShaderARB(FragmentShader);
 

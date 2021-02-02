@@ -1,0 +1,3 @@
+clang++
+-std=c++17 -Weverything -Wall -O2 -Werror -pedantic-errors -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-padded
+-lSDL2 -lGL -lGLEW -lSDL2_ttf

@@ -3,23 +3,29 @@
 #include <SDL/SDL.h>
 #include <GL/glew.h>
 #include <SDL/SDL_ttf.h>
+
 #include "matrix.hpp"
 #include "shader.hpp"
+
 #include <iostream>
 #include <string>
 #include <math.h>
+
 #include "automaton.hpp"
+#include "base.hpp"
+
+namespace ca {
 
 enum FontSize {size24, size16};
 
 class Grid {
 private:
-    unsigned int height, width;
-    inline void FillCell(unsigned int x, unsigned int y, double *color);
+    u32 height, width;
+    inline void FillCell(u32 x, u32 y, f64 *color);
 public:
     Grid() {}
-    unsigned int cellsize;
-    Grid(unsigned int h, unsigned int w, unsigned int cllsz) : height(h), width(w), cellsize(cllsz) {}
+    u32 cellsize;
+    Grid(u32 h, u32 w, u32 cllsz) : height(h), width(w), cellsize(cllsz) {}
 
     Grid &operator = (const Grid &right) {
         if (this == &right)
@@ -30,11 +36,11 @@ public:
         return *this;
     }
 
-    unsigned int GetHeight() {
+    u32 GetHeight() {
         return height;
     }
 
-    unsigned int GetWidth() {
+    u32 GetWidth() {
         return width;
     }
 
@@ -44,8 +50,8 @@ public:
 };
 
 struct RelativePosition {
-    double x;
-    double y;
+    f64 x;
+    f64 y;
 };
 
 class HUD {
@@ -73,9 +79,9 @@ public:
 
 class Graphics {
 public:
-    unsigned int width, height; /* SDL window */
+    u32 width, height; /* SDL window */
     int uniform_tex0;
-    double dx, dy; /* Scaling displacement */
+    f64 dx, dy; /* Scaling displacement */
     GLuint fbo, bloom_texture;
     Grid grid;
     SDL_Surface *display;
@@ -92,7 +98,7 @@ public:
         width = height = 800;
     }
 
-    Graphics(unsigned int w, unsigned int h) : width(w), height(h) {
+    Graphics(u32 w, u32 h) : width(w), height(h) {
         display = nullptr;
         SDL_OGL.x = 0.375;
         SDL_OGL.y = 0.375;
@@ -116,5 +122,6 @@ public:
     }
     ~Graphics() {}
     bool Init();
-    static int nextpoweroftwo(int x);
+    static i32 nextpoweroftwo(i32 x);
 };
+} // namespace ca

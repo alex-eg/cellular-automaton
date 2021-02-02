@@ -1,5 +1,6 @@
 #include "life.hpp"
 
+namespace ca {
 void LApp::Event(SDL_Event *Event)
 {
     if (help) Event_Help(Event);
@@ -236,11 +237,13 @@ void LApp::MouseButtonUp(Uint8 button, int x, int y)
 #pragma clang diagnostic ignored "-Wswitch-enum"
     switch (button) {
     case SDL_BUTTON_RIGHT: {
-    nowDrawing = false;
-    whatDraw = 1;
-    break;
+        nowDrawing = false;
+        whatDraw = 1;
+        break;
     }
-    default:break;
+    default:
+        break;
     }
 #pragma clang diagnostic pop
 }
+} // namespace ca

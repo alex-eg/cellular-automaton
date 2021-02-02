@@ -1,17 +1,20 @@
 #pragma once
 
+#include "base.hpp"
+
 #include <iostream>
 #include <fstream>
 #include <ios>
 #include <new>
 #include <GL/glew.h>
 
+namespace ca {
 class Shader {
 private:
     GLuint FragmentShader, VertexShader;
     bool Ready;
-    unsigned int FileLength(std::ifstream &file);
-    int LoadShader(const char* filename, GLchar **ShaderSource, unsigned int &len);
+    u32 FileLength(std::ifstream &file);
+    int LoadShader(const char* filename, GLchar **ShaderSource, u32 &len);
 public:
     GLuint ShaderProgram;
     bool Running;
@@ -34,9 +37,9 @@ public:
 
 class DefaultShader : public Shader {
 private:
-    unsigned int width, height;
+    u32 width, height;
 public:
-    DefaultShader(unsigned int w, unsigned int h) : width(w), height(h) {}
+    DefaultShader(u32 w, u32 h) : width(w), height(h) {}
     DefaultShader() {}
     DefaultShader &operator = (const DefaultShader &right)
     {
@@ -46,9 +49,11 @@ public:
     return *this;
     }
 
-    void Invoke(void)
-    {
-    int uniform_WindowSize = glGetUniformLocation(ShaderProgram,"WindowSize");
-        glUniform2f(uniform_WindowSize, static_cast<GLfloat>(width), static_cast<GLfloat>(height));
+    void Invoke(void) {
+        i32 uniform_WindowSize =
+            glGetUniformLocation(ShaderProgram, "WindowSize");
+        glUniform2f(uniform_WindowSize, static_cast<GLfloat>(width),
+                    static_cast<GLfloat>(height));
     }
 };
+} // namespace ca

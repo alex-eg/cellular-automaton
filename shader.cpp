@@ -1,6 +1,7 @@
 #include "shader.hpp"
 
-unsigned int Shader::FileLength(std::ifstream &file)
+namespace ca {
+u32 Shader::FileLength(std::ifstream &file)
 {
     if(!file.good()) return 0;
 
@@ -8,10 +9,10 @@ unsigned int Shader::FileLength(std::ifstream &file)
     long len = file.tellg();
     file.seekg(std::ios::beg);
 
-    return static_cast<unsigned int>(len);
+    return static_cast<u32>(len);
 }
 
-int Shader::LoadShader(const char* filename, GLchar **ShaderSource, unsigned int &len)
+int Shader::LoadShader(const char* filename, GLchar **ShaderSource, u32 &len)
 {
     std::ifstream file;
 
@@ -24,7 +25,7 @@ int Shader::LoadShader(const char* filename, GLchar **ShaderSource, unsigned int
 
     (*ShaderSource)[len] = '\0';
 
-    unsigned int i=0;
+    u32 i=0;
 
     while (file.good()) {
     (*ShaderSource)[i] = static_cast<GLchar>(file.get());
@@ -41,7 +42,7 @@ int Shader::LoadShader(const char* filename, GLchar **ShaderSource, unsigned int
 bool Shader::LoadVertexShader(const std::string filename)
 {
     GLchar *ssource;
-    unsigned int slen;
+    u32 slen;
 
     int ret = LoadShader(filename.c_str(), &ssource, slen);
     if (ret!=0) return false;
@@ -63,7 +64,7 @@ bool Shader::LoadVertexShader(const std::string filename)
 bool Shader::LoadFragmentShader(const std::string filename)
 {
     GLchar *ssource;
-    unsigned int slen;
+    u32 slen;
 
     int ret = LoadShader(filename.c_str(), &ssource, slen);
     if (ret!=0) return false;
@@ -110,8 +111,10 @@ void Shader::End()
     Running = false;
 }
 
-void Shader::Switch()
-{
-    if (Running) End();
-    else Begin();
+void Shader::Switch() {
+    if (Running)
+        End();
+    else
+        Begin();
 }
+} // namespace ca

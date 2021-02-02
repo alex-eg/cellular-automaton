@@ -1,10 +1,11 @@
 #include "automaton.hpp"
 #include <iostream>
 
+namespace ca {
 void Automaton::Update(void)
 {
-    for (unsigned int i=0; i<height; i++)
-    for (unsigned int j=0; j<width; j++) {
+    for (u32 i=0; i<height; i++)
+    for (u32 j=0; j<width; j++) {
         StateCount[(*front)(i,j)]--;
         (*back)(i,j) = Transition[State[(*front)(i,j)].code](Neighbours(i, j));
         StateCount[(*back)(i,j)]++;
@@ -15,12 +16,12 @@ void Automaton::Update(void)
     back = temp;
 }
 
-std::map <statecode, int> Automaton::Neighbours(unsigned int x, unsigned int y)
+std::map <statecode, int> Automaton::Neighbours(u32 x, u32 y)
 {
     std::map <statecode, int> ret;
 
-    unsigned int cx[3] = {x-1, x, x+1};
-    unsigned int cy[3] = {y-1, y, y+1};
+    u32 cx[3] = {x-1, x, x+1};
+    u32 cy[3] = {y-1, y, y+1};
 
     if (x == 0) cx[0] = height -1;
     else if (x == height - 1) cx[2] = 0;
@@ -47,8 +48,8 @@ void Automaton::Draw(int x, int y, statecode val)
 
 void Automaton::Randomize()
 {
-    for (unsigned int i=0; i<height; i++) {
-        for (unsigned int j=0; j<width; j++) {
+    for (u32 i=0; i<height; i++) {
+        for (u32 j=0; j<width; j++) {
             StateCount[(*front)(i,j)]--;
             (*front)(i,j) = rand() % 2;
             StateCount[(*front)(i,j)]++;
@@ -58,8 +59,8 @@ void Automaton::Randomize()
 
 void Automaton::Clear()
 {
-    for (unsigned int i=0; i<height; i++) {
-    for (unsigned int j=0; j<width; j++) {
+    for (u32 i=0; i<height; i++) {
+    for (u32 j=0; j<width; j++) {
         StateCount[1] = 0;
         (*front)(i,j) = 0;
         StateCount[0] = width*height;
@@ -67,8 +68,8 @@ void Automaton::Clear()
     }
 }
 
-void Automaton::AddState(AutomatonState s, AutomatonTransition t)
-{
+void Automaton::AddState(AutomatonState s, AutomatonTransition t) {
     State[s.code] = s;
     Transition[s.code] = t;
 }
+} // namespace ca

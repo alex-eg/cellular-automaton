@@ -1,6 +1,7 @@
 #include "life.hpp"
 #include <iostream>
 
+namespace ca {
 inline void LApp::__Init__(void)
 {
     graphics = Graphics(800,800);
@@ -21,7 +22,7 @@ LApp::LApp()
     Board.x = Board.y = 40;
 }
 
-LApp::LApp(unsigned int x, unsigned int y, std::string r)
+LApp::LApp(u32 x, u32 y, std::string r)
 {
     __Init__();
     Board.x = x;
@@ -221,9 +222,11 @@ void LApp::Clean()
 }
 
 /* --------------------------------------------- */
-inline void CatchErrorOpengl(int l)
-{
+inline void CatchErrorOpengl(int l) {
     GLenum errCode;
-    if ((errCode = glGetError()) != GL_NO_ERROR)
-    std::cout<<"Opengl error "<<errCode<<" on line "<<l - 1<<std::endl;
+    if ((errCode = glGetError()) != GL_NO_ERROR) {
+        std::cout << "Opengl error " << errCode << " on line " << l - 1
+                  << std::endl;
+    }
 }
+} // namespace ca

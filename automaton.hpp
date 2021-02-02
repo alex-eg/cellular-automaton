@@ -5,11 +5,12 @@
 #include <string>
 #include <map>
 
-using statecode = unsigned char;
+namespace ca {
+using statecode = u8;
 
 class AutomatonState {
 private:
-    double color[3];
+    f64 color[3];
     std::string name;
     int lifespan;
 public:
@@ -23,7 +24,7 @@ public:
         lifespan = 0;
     }
 
-    AutomatonState(statecode c, double r, double g, double b, std::string n, int l = 0) {
+    AutomatonState(statecode c, f64 r, f64 g, f64 b, std::string n, int l = 0) {
         code = c;
         color[0] = r;
         color[1] = g;
@@ -32,7 +33,7 @@ public:
         lifespan = l;
     }
 
-    double *GetColor(void) {
+    f64 *GetColor(void) {
         return color;
     }
 
@@ -94,15 +95,15 @@ public:
 
 class Automaton {
 private:
-    unsigned int width, height;
+    u32 width, height;
     LMatrix <statecode> field1;
     LMatrix <statecode> field2;
     LMatrix <statecode> *back;
-    std::map <statecode, int> Neighbours(unsigned int x, unsigned int y);
+    std::map <statecode, int> Neighbours(u32 x, u32 y);
 public:
     std::map <statecode, AutomatonTransition> Transition;
     std::map <statecode, AutomatonState> State;
-    std::map <statecode, unsigned int> StateCount;
+    std::map <statecode, u32> StateCount;
     LMatrix <statecode> *front;
 
     Automaton() {
@@ -110,18 +111,18 @@ public:
         back = nullptr;
     }
 
-    statecode &operator () (unsigned int i, unsigned int j) {
+    statecode &operator () (u32 i, u32 j) {
         return (*front)(i,j);
     }
 
-    Automaton(unsigned int w, unsigned int h) : width(w), height(h) {
+    Automaton(u32 w, u32 h) : width(w), height(h) {
         field1 = LMatrix <statecode> (width, height);
         field2 = LMatrix <statecode> (width, height);
         front = &field1;
         back = &field2;
 
-        for (unsigned int i=0; i<height; ++i) {
-            for (unsigned int j=0; j<width; ++j) {
+        for (u32 i=0; i<height; ++i) {
+            for (u32 j=0; j<width; ++j) {
                 field1(i,j) = field2(i,j) = 0;
             }
         }
@@ -151,3 +152,4 @@ public:
     void Draw(int x, int y, statecode val);
     void Randomize();
 };
+} // namespace ca

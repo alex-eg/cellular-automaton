@@ -2,12 +2,14 @@
 
 int main(int argc, char **argv)
 {
+    using namespace ca;
+
     if (argc == 1) {
     LApp Life(150, 150, "23/3");
     return Life.Execute();
     } else if (argc == 4) {
-    unsigned int x = static_cast<unsigned int>(atoi(argv[1]));
-    unsigned int y = static_cast<unsigned int>(atoi(argv[2]));
+    u32 x = static_cast<u32>(atoi(argv[1]));
+    u32 y = static_cast<u32>(atoi(argv[2]));
     LApp Life(x, y, argv[3]);
     return Life.Execute();
     } else {

@@ -1,5 +1,6 @@
 #include "graphics.hpp"
 
+namespace ca {
 void Grid::DrawBorder()
 {
     glColor3f(0.5, 0.5, 0.5);
@@ -27,7 +28,7 @@ void Grid::DrawBorder()
 void Grid::Draw()
 {
     glColor3f(0.8f, 0.8f, 0.8f);
-    for(unsigned int i = 1; i<=width; i++) {
+    for(u32 i = 1; i<=width; i++) {
         if (i == width/2) glColor3f(0.2f, 0.723f, 0.32f);
         glBegin(GL_LINES);
         glVertex2f(static_cast<GLfloat>(cellsize*i+i), 0);
@@ -35,7 +36,7 @@ void Grid::Draw()
         glEnd();
         if (i == width/2) glColor3f(0.8f, 0.8f, 0.8f);
     }
-    for(unsigned int i = 1; i<=height; i++) {
+    for(u32 i = 1; i<=height; i++) {
         if (i == height/2) glColor3f(0.2f, 0.723f, 0.32f);
         glBegin(GL_LINES);
         glVertex2f(0, static_cast<GLfloat>(cellsize*i+i));
@@ -47,15 +48,15 @@ void Grid::Draw()
 
 void Grid::DrawWithMap(Automaton &life)
 {
-    for (unsigned int i=0; i<height; i++) {
-        for(unsigned int j=0; j<width; j++) {
+    for (u32 i=0; i<height; i++) {
+        for(u32 j=0; j<width; j++) {
             statecode cell_state = life(i,j);
             FillCell(i, j, life.State[cell_state].GetColor());
         }
     }
 }
 
-inline void Grid::FillCell(unsigned int x, unsigned int y, double *color)
+inline void Grid::FillCell(u32 x, u32 y, f64 *color)
 {
     glColor3f(static_cast<GLfloat>(color[0]), static_cast<GLfloat>(color[1]), static_cast<GLfloat>(color[2]));
     glBegin(GL_QUADS);
@@ -125,7 +126,7 @@ bool Graphics::Init()
 
 int Graphics::nextpoweroftwo(int x)
 {
-    double logbase2 = log(x) / log(2);
+    f64 logbase2 = log(x) / log(2);
     return static_cast<int>(round(pow(2,ceil(logbase2))));
 }
 
@@ -232,10 +233,10 @@ void HUD::glEnable2D()
     glLoadIdentity();
 }
 
-void HUD::glDisable2D()
-{
+void HUD::glDisable2D() {
     glMatrixMode(GL_PROJECTION);
     glPopMatrix();
     glMatrixMode(GL_MODELVIEW);
     glPopMatrix();
 }
+} // namespace ca

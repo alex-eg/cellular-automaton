@@ -1,4 +1,6 @@
 #include "life.hpp"
+#include "graphics.hpp"
+
 #include <iostream>
 
 namespace ca {
@@ -8,6 +10,8 @@ BoardSize::BoardSize(u32 width, u32 height)
 
 LApp::LApp(u32 x, u32 y, std::string _rule)
     : board(x, y)
+    , life(new Automaton)
+    , graphics(new Graphics)
     , rule(_rule) {}
 
 int LApp::execute() {
@@ -23,7 +27,7 @@ int LApp::execute() {
         }
         loop();
         render();
-        SDL_Delay(1);
+        SDL_Delay(10);
     }
     clean();
     return 0;
@@ -32,8 +36,8 @@ int LApp::execute() {
 bool LApp::init() {
     size_t found;
 
-    graphics.grid = Grid(board.x, board.y, 10);
-    life = Automaton(board.x, board.y);
+    graphics->grid = Grid(board.x, board.y, 10);
+    life = std::make_unique<Automaton>(board.x, board.y);
 
     AutomatonState dead = AutomatonState(0, 0.0, 0.0, 0.0, "dead");
     AutomatonState live = AutomatonState(1, 0.3, 0.8765, 0.3, "live");
@@ -63,13 +67,13 @@ bool LApp::init() {
     AutomatonTransition survive =
         AutomatonTransition(live.code, dead.code, surv_req, "survive");
 
-    life.add_state(dead, born);
-    life.add_state(live, survive);
+    life->add_state(dead, born);
+    life->add_state(live, survive);
 
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) < 0) {
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0) {
         return false;
     }
-    return graphics.init();
+    return graphics->init();
 }
 
 void LApp::render() {
@@ -91,72 +95,71 @@ void LApp::render_help() {
 
     position.x = 160;
     position.y = 700;
-    graphics.hud.render_text("Несложный симулятор \"Жизни\" Конвея", &position,
-                            &color, size24);
+    graphics->hud.render_text("Несложный симулятор \"Жизни\" Конвея", &position,
+                            &color, FontSize::size24);
     position.x = 55;
     position.y = 600;
     position.y -= position.h;
-    graphics.hud.render_text(
+    graphics->hud.render_text(
         "F1                                       показать/скрыть эту справку",
-        &position, &color, size16);
+        &position, &color, FontSize::size16);
     position.y -= position.h;
-    graphics.hud.render_text(
+    graphics->hud.render_text(
         "Пробел                                   остановить/продолжить",
-        &position, &color, size16);
+        &position, &color, FontSize::size16);
     position.y -= position.h;
-    graphics.hud.render_text("S                                        один шаг",
-                            &position, &color, size16);
+    graphics->hud.render_text("S                                        один шаг",
+                            &position, &color, FontSize::size16);
     position.y -= position.h;
-    graphics.hud.render_text(
+    graphics->hud.render_text(
         "R                                        случайно заполнить поле",
-        &position, &color, size16);
+        &position, &color, FontSize::size16);
     position.y -= position.h;
-    graphics.hud.render_text(
+    graphics->hud.render_text(
         "C                                        очистить поле", &position,
-        &color, size16);
+        &color, FontSize::size16);
     position.y -= position.h;
-    graphics.hud.render_text(
+    graphics->hud.render_text(
         "Правая кнопка мыши                       рисовать/стирать", &position,
-        &color, size16);
+        &color, FontSize::size16);
     position.y -= position.h;
-    graphics.hud.render_text(
+    graphics->hud.render_text(
         "Левая кнопка мыши                        перемещать обзор", &position,
-        &color, size16);
+        &color, FontSize::size16);
     position.y -= position.h;
-    graphics.hud.render_text(
+    graphics->hud.render_text(
         "Колесо мыши                              приблизить/отдалить",
-        &position, &color, size16);
+        &position, &color, FontSize::size16);
     position.y -= position.h;
-    graphics.hud.render_text(
+    graphics->hud.render_text(
         "Num +                                    увеличить скорость",
-        &position, &color, size16);
+        &position, &color, FontSize::size16);
     position.y -= position.h;
-    graphics.hud.render_text(
+    graphics->hud.render_text(
         "Num -                                    уменьшить скорость",
-        &position, &color, size16);
+        &position, &color, FontSize::size16);
     position.y -= position.h;
-    graphics.hud.render_text("ESC                                      выход",
-                            &position, &color, size16);
+    graphics->hud.render_text("ESC                                      выход",
+                            &position, &color, FontSize::size16);
 
     glDisable(GL_BLEND);
 
     HUD::gl_disable2_d();
-
-    SDL_GL_SwapBuffers();
+    graphics->present();
 }
 
 void LApp::render_field() {
     glClear(GL_COLOR_BUFFER_BIT);
 
     glPushMatrix();
-    glTranslatef(static_cast<GLfloat>(graphics.dx),
-                 static_cast<GLfloat>(graphics.dy), 0.0);
+    glTranslatef(static_cast<GLfloat>(graphics->dx),
+                 static_cast<GLfloat>(graphics->dy), 0.0);
 
-    graphics.grid.draw_with_map(life);
-    graphics.grid.draw_border();
+    graphics->grid.draw_with_map(life);
+    graphics->grid.draw_border();
 
-    if (graphics.grid.cellsize > 22) {
-        graphics.grid.draw();
+    if (graphics->grid.cellsize > 22) {
+        graphics->grid.draw();
     }
 
     glPopMatrix();
@@ -169,7 +172,7 @@ void LApp::render_field() {
         SDL_Color color = { 255, 255, 255, 0 };
         position.x = 10;
         position.y = 760;
-        graphics.hud.render_text("Пауза", &position, &color, size24);
+        graphics->hud.render_text("Пауза", &position, &color, FontSize::size24);
 
         glDisable(GL_BLEND);
         HUD::gl_disable2_d();
@@ -195,23 +198,23 @@ void LApp::render_field() {
 
     position.x = 10;
     position.y = 0;
-    graphics.hud.render_text(("Правило: " + rule).c_str(), &position, &color,
-                            size16);
+    graphics->hud.render_text(("Правило: " + rule).c_str(), &position, &color,
+                              FontSize::size16);
     position.x = 300;
-    sprintf(buff, "Активных: %d", life.state_count[1]);
-    graphics.hud.render_text(buff, &position, &color, size16);
+    sprintf(buff, "Активных: %d", life->state_count[1]);
+    graphics->hud.render_text(buff, &position, &color, FontSize::size16);
     position.x = 500;
-    sprintf(buff, "Неактивных: %d", life.state_count[0]);
-    graphics.hud.render_text(buff, &position, &color, size16);
+    sprintf(buff, "Неактивных: %d", life->state_count[0]);
+    graphics->hud.render_text(buff, &position, &color, FontSize::size16);
 
     HUD::gl_disable2_d();
 
-    SDL_GL_SwapBuffers();
+    graphics->present();
 }
 
 void LApp::loop() {
     if (updatingstep && (update_counter == 0)) {
-        life.update();
+        life->update();
     }
     if (updatingstep && (update_counter < 20)) {
         update_counter++;
@@ -224,20 +227,12 @@ void LApp::loop() {
         counter++;
     }
     if (counter > speed) {
-        life.update();
+        life->update();
         counter = 0;
     }
 }
 
-void LApp::clean() {
-    glFinish();
-    if (graphics.fbo != 0) {
-        glDeleteFramebuffers(1, &graphics.fbo);
-    }
-    TTF_CloseFont(graphics.hud.font16);
-    TTF_CloseFont(graphics.hud.font24);
-    TTF_Quit();
-    SDL_FreeSurface(graphics.display);
+LApp::~LApp() {
     SDL_Quit();
     std::cout << "Clean normal, exitting\n";
 }

@@ -1,10 +1,14 @@
 #include "automaton.hpp"
-#include "graphics.hpp"
 #include "base.hpp"
 
-#include <SDL/SDL.h>
+#include <SDL2/SDL.h>
+
+#include <memory>
 
 namespace ca {
+class Graphics;
+class Automaton;
+
 struct BoardSize {
     BoardSize(u32 width, u32 height);
     u32 x;
@@ -13,8 +17,8 @@ struct BoardSize {
 
 class LApp {
 public:
-    LApp();
     LApp(u32 width, u32 height, std::string rule);
+    ~LApp();
 
     bool init();
     i32 execute();
@@ -32,13 +36,13 @@ public:
     void clean();
 
     void exit();
-    void key_down(SDLKey sym, SDLMod mod, Uint16 unicode);
-    void help_key_down(SDLKey sym, SDLMod mod, Uint16 unicode);
-    void key_up(SDLKey sym, SDLMod mod, Uint16 unicode);
+    void key_down(SDL_Keycode sym);
+    void help_key_down(SDL_Keycode sym);
+    void key_up(SDL_Keycode sym);
     void mouse_move(i32 m_x, i32 m_y, i32 rel_x, i32 rel_y, bool left, bool right,
                    bool middle);
-    void mouse_button_down(Uint8 button, i32 x, i32 y);
-    void mouse_button_up(Uint8 button, i32 x, i32 y);
+    void mouse_button_down(u8 button, i32 x, i32 y);
+    void mouse_wheel(const SDL_MouseWheelEvent& event);
 
 private:
     bool running = false;
@@ -47,11 +51,11 @@ private:
     i32 update_counter = 0;
     i32 counter = 0;
     i32 speed = 2;
-    Automaton life;
+    BoardSize board;
+    std::unique_ptr<Automaton> life = nullptr;
     bool now_drawing = false;
     statecode what_draw = 1;
-    BoardSize board;
-    Graphics graphics;
+    std::unique_ptr<Graphics> graphics;
 
     bool help;
 

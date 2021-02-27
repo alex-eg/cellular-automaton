@@ -1,3 +1,4 @@
+#include "graphics.hpp"
 #include "life.hpp"
 
 namespace ca {
@@ -12,8 +13,7 @@ void LApp::process_event(SDL_Event *event) {
 void LApp::process_event_help(SDL_Event *event) {
     switch (event->type) {
     case SDL_KEYDOWN: {
-        help_key_down(event->key.keysym.sym, event->key.keysym.mod,
-                    event->key.keysym.unicode);
+        help_key_down(event->key.keysym.sym);
         break;
     }
     case SDL_QUIT: {
@@ -25,13 +25,7 @@ void LApp::process_event_help(SDL_Event *event) {
     }
 }
 
-void LApp::help_key_down(SDLKey sym, SDLMod mod, Uint16 unicode) {
-    std::ignore = mod;
-    std::ignore = unicode;
-
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wswitch-enum"
-
+void LApp::help_key_down(SDL_Keycode sym) {
     switch (sym) {
     case SDLK_F1:
     case SDLK_ESCAPE: {
@@ -41,26 +35,24 @@ void LApp::help_key_down(SDLKey sym, SDLMod mod, Uint16 unicode) {
     default:
         break;
     }
-#pragma clang diagnostic pop
 }
 
 void LApp::process_event_field(SDL_Event *event) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wswitch-enum"
-
     switch (event->type) {
     case SDL_KEYDOWN: {
-        key_down(event->key.keysym.sym, event->key.keysym.mod,
-                event->key.keysym.unicode);
+        key_down(event->key.keysym.sym);
         break;
     }
     case SDL_KEYUP: {
-        key_up(event->key.keysym.sym, event->key.keysym.mod,
-              event->key.keysym.unicode);
+        key_up(event->key.keysym.sym);
         break;
     }
     case SDL_QUIT: {
         running = false;
+        break;
+    }
+    case SDL_MOUSEWHEEL: {
+        mouse_wheel(event->wheel);
         break;
     }
     case SDL_MOUSEBUTTONDOWN: {
@@ -79,15 +71,9 @@ void LApp::process_event_field(SDL_Event *event) {
     default:
         break;
     }
-#pragma clang diagnostic pop
 }
 
-void LApp::key_down(SDLKey sym, SDLMod mod, Uint16 unicode) {
-    std::ignore = mod;
-    std::ignore = unicode;
-
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wswitch-enum"
+void LApp::key_down(SDL_Keycode sym) {
     switch (sym) {
     case SDLK_SPACE: {
         if (updating) {
@@ -106,11 +92,11 @@ void LApp::key_down(SDLKey sym, SDLMod mod, Uint16 unicode) {
         break;
     }
     case SDLK_r: {
-        life.randomize();
+        life->randomize();
         break;
     }
     case SDLK_c: {
-        life.clear();
+        life->clear();
         break;
     }
     case SDLK_LCTRL: {
@@ -118,12 +104,12 @@ void LApp::key_down(SDLKey sym, SDLMod mod, Uint16 unicode) {
         break;
     }
     case SDLK_b: {
-        graphics.bloom.Switch();
+        graphics->bloom.Switch();
         break;
     }
     case SDLK_h: {
-        graphics.shade.Switch();
-        graphics.shade.invoke();
+        graphics->shade.Switch();
+        graphics->shade.invoke();
         break;
     }
     case SDLK_KP_PLUS: {
@@ -155,15 +141,9 @@ void LApp::key_down(SDLKey sym, SDLMod mod, Uint16 unicode) {
     default:
         break;
     }
-#pragma clang diagnostic pop
 }
 
-void LApp::key_up(SDLKey sym, SDLMod mod, Uint16 unicode) {
-    std::ignore = mod;
-    std::ignore = unicode;
-
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wswitch-enum"
+void LApp::key_up(SDL_Keycode sym) {
     switch (sym) {
     case SDLK_LCTRL: {
         //nowDrawing = false;
@@ -177,7 +157,6 @@ void LApp::key_up(SDLKey sym, SDLMod mod, Uint16 unicode) {
     default:
         break;
     }
-#pragma clang diagnostic pop
 }
 
 void LApp::mouse_move(int m_x, int m_y, int rel_x, int rel_y, bool left, bool right,
@@ -186,75 +165,41 @@ void LApp::mouse_move(int m_x, int m_y, int rel_x, int rel_y, bool left, bool ri
 
     if (now_drawing && right && !updating) {
         int i, j;
-        i = static_cast<int>((m_x - graphics.sdl_ogl.x - graphics.dx) /
-                             (graphics.grid.cellsize + 1));
-        j = static_cast<int>((m_y - graphics.sdl_ogl.y - graphics.dy) /
-                             (graphics.grid.cellsize + 1));
+        i = static_cast<int>((m_x - graphics->sdl_ogl.x - graphics->dx) /
+                             (graphics->grid.cellsize + 1));
+        j = static_cast<int>((m_y - graphics->sdl_ogl.y - graphics->dy) /
+                             (graphics->grid.cellsize + 1));
         if (i >= 0 && j >= 0 && i < static_cast<int>(board.x) &&
             j < static_cast<int>(board.y)) {
-            life.draw(i, j, what_draw);
+            life->draw(i, j, what_draw);
         }
     }
 
     if (left) {
         glTranslatef(static_cast<GLfloat>(rel_x), static_cast<GLfloat>(rel_y), 0);
-        graphics.sdl_ogl.x += rel_x;
-        graphics.sdl_ogl.y += rel_y;
+        graphics->sdl_ogl.x += rel_x;
+        graphics->sdl_ogl.y += rel_y;
     }
 }
 
-void LApp::mouse_button_down(Uint8 button, int x, int y) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wswitch-enum"
+void LApp::mouse_button_down(u8 button, int x, int y) {
     switch (button) {
-    case SDL_BUTTON_WHEELUP: {
-        if (graphics.grid.cellsize == 1) {
-            graphics.grid.cellsize++;
-        } else {
-            graphics.grid.cellsize += 2;
-        }
-        if (graphics.grid.cellsize > 100) {
-            graphics.grid.cellsize = 100;
-        }
-
-        graphics.dx = (graphics.width -
-                       graphics.grid.get_width() * graphics.grid.cellsize) /
-            2;
-        graphics.dy = (graphics.height -
-                       graphics.grid.get_height() * graphics.grid.cellsize) /
-            2;
-        break;
-    }
-    case SDL_BUTTON_WHEELDOWN: {
-        graphics.grid.cellsize -= 2;
-        if (graphics.grid.cellsize < 1) {
-            graphics.grid.cellsize = 1;
-        }
-
-        graphics.dx = (graphics.width -
-                       graphics.grid.get_width() * graphics.grid.cellsize) /
-            2;
-        graphics.dy = (graphics.height -
-                       graphics.grid.get_height() * graphics.grid.cellsize) /
-            2;
-        break;
-    }
     case SDL_BUTTON_RIGHT: {
         if (!updating) {
             now_drawing = true;
             int i, j;
-            i = static_cast<int>((x - graphics.sdl_ogl.x - graphics.dx) /
-                                 (graphics.grid.cellsize + 1));
-            j = static_cast<int>((y - graphics.sdl_ogl.y - graphics.dy) /
-                                 (graphics.grid.cellsize + 1));
+            i = static_cast<int>((x - graphics->sdl_ogl.x - graphics->dx) /
+                                 (graphics->grid.cellsize + 1));
+            j = static_cast<int>((y - graphics->sdl_ogl.y - graphics->dy) /
+                                 (graphics->grid.cellsize + 1));
             if (i >= 0 && j >= 0 && i < static_cast<int>(board.x) &&
                 j < static_cast<int>(board.y)) {
-                if ((*life.front)(i, j) == 0) {
+                if ((*life->front)(i, j) == 0) {
                     what_draw = 1;
                 } else {
                     what_draw = 0;
                 }
-                life.draw(i, j, what_draw);
+                life->draw(i, j, what_draw);
             }
         }
         break;
@@ -262,23 +207,37 @@ void LApp::mouse_button_down(Uint8 button, int x, int y) {
     default:
         break;
     }
-#pragma clang diagnostic pop
 }
 
-void LApp::mouse_button_up(Uint8 button, int x, int y) {
-    std::ignore = x = y;
+void LApp::mouse_wheel(const SDL_MouseWheelEvent &event) {
+    if (event.y > 0) { // Scroll up
+        if (graphics->grid.cellsize == 1) {
+            graphics->grid.cellsize++;
+        } else {
+            graphics->grid.cellsize += 2;
+        }
+        if (graphics->grid.cellsize > 100) {
+            graphics->grid.cellsize = 100;
+        }
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wswitch-enum"
-    switch (button) {
-    case SDL_BUTTON_RIGHT: {
-        now_drawing = false;
-        what_draw = 1;
-        break;
+        graphics->dx = (graphics->width -
+                       graphics->grid.get_width() * graphics->grid.cellsize) /
+            2;
+        graphics->dy = (graphics->height -
+                       graphics->grid.get_height() * graphics->grid.cellsize) /
+            2;
+    } else if (event.y < 0) { // Scroll down
+        graphics->grid.cellsize -= 2;
+        if (graphics->grid.cellsize < 1) {
+            graphics->grid.cellsize = 1;
+        }
+
+        graphics->dx = (graphics->width -
+                       graphics->grid.get_width() * graphics->grid.cellsize) /
+            2;
+        graphics->dy = (graphics->height -
+                       graphics->grid.get_height() * graphics->grid.cellsize) /
+            2;
     }
-    default:
-        break;
-    }
-#pragma clang diagnostic pop
 }
 } // namespace ca

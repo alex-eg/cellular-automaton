@@ -1,6 +1,33 @@
 #include "graphics.hpp"
+#include "automaton.hpp"
+
+#include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL.h>
 
 namespace ca {
+Grid::Grid(u32 _width, u32 _height, u32 _cellsize)
+    : cellsize(_cellsize)
+    , width(_width)
+    , height(_height) {}
+
+Grid & Grid::operator=(const Grid &right) {
+    if (this == &right) {
+        return *this;
+    }
+    width = right.width;
+    height = right.height;
+    cellsize = right.cellsize;
+    return *this;
+}
+
+u32 Grid::get_height() const {
+    return height;
+}
+
+u32 Grid::get_width() const {
+    return width;
+}
+
 void Grid::draw_border() {
     glColor3f(0.5, 0.5, 0.5);
     glBegin(GL_LINES);
@@ -56,11 +83,11 @@ void Grid::draw() {
     }
 }
 
-void Grid::draw_with_map(Automaton &life) {
+void Grid::draw_with_map(const std::unique_ptr<Automaton> &life) {
     for (u32 i = 0; i < height; i++) {
         for (u32 j = 0; j < width; j++) {
-            statecode cell_state = life(i, j);
-            fill_cell(i, j, life.state[cell_state].get_color());
+            statecode cell_state = (*life)(i, j);
+            fill_cell(i, j, life->state[cell_state].get_color());
         }
     }
 }
@@ -80,6 +107,20 @@ inline void Grid::fill_cell(u32 x, u32 y, f64 *color) {
     glEnd();
 }
 
+RelativePosition::RelativePosition(f64 _x, f64 _y)
+    : x(_x)
+    , y(_y) {}
+
+Graphics::Graphics()
+    : sdl_ogl(0.375, 0.375)
+    , window(nullptr, [](SDL_Window *) {}) {}
+
+Graphics::Graphics(u32 w, u32 h)
+    : width(w)
+    , height(h)
+    , sdl_ogl(0.375, 0.375)
+    , window(nullptr, [](SDL_Window *) {}) {}
+
 bool Graphics::init() {
     SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
@@ -93,19 +134,22 @@ bool Graphics::init() {
     SDL_GL_SetAttribute(SDL_GL_ACCUM_BLUE_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_ACCUM_ALPHA_SIZE, 8);
 
-    if ((display = SDL_SetVideoMode(
-             static_cast<int>(width), static_cast<int>(height), 32,
-             SDL_HWSURFACE | SDL_DOUBLEBUF | SDL_OPENGL)) == nullptr) {
+    window = std::unique_ptr<SDL_Window, void(*)(SDL_Window*)>(
+        SDL_CreateWindow("Cellular Automaton", 0, 0,
+                         static_cast<i32>(width), static_cast<i32>(height),
+                         SDL_WINDOW_OPENGL),
+        SDL_DestroyWindow);
+    if (window == nullptr) {
         return false;
     }
 
     /* Load and init GLEW */
-    glewExperimental = true;
-    GLenum err = glewInit();
-    if (err != GLEW_OK) {
-        std::cout << "glewInit failed, aborting." << std::endl;
-        exit(1);
-    }
+//    glewExperimental = true;
+//    GLenum err = glewInit();
+//    if (err != GLEW_OK) {
+//        std::cout << "glewInit failed, aborting." << std::endl;
+//        exit(1);
+//    }
 
     /* Load and compile shaders */
     shade = DefaultShader(width, height);
@@ -149,25 +193,46 @@ bool Graphics::init() {
     return hud.init();
 }
 
+void Graphics::present() {
+    SDL_GL_SwapWindow(window.get());
+}
+
+
 int Graphics::nextpoweroftwo(int x) {
     f64 logbase2 = log(x) / log(2);
     return static_cast<int>(round(pow(2, ceil(logbase2))));
 }
 
+Graphics::~Graphics() {
+    glFinish();
+    if (fbo != 0) {
+        glDeleteFramebuffers(1, &fbo);
+    }
+}
+
+
 /* Class HUD */
+
+HUD::HUD()
+    : font16(nullptr, [](TTF_Font *) {})
+    , font24(nullptr, [](TTF_Font *) {}) {}
 
 bool HUD::init(void) {
     if (TTF_Init() == -1) {
         std::cout << "TTF init failed\n";
         return false;
     }
-    font24 = TTF_OpenFont("DejaVuSansMono.ttf", 24);
+    font24 = std::unique_ptr<TTF_Font, void(*)(TTF_Font*)>(
+        TTF_OpenFont("DejaVuSansMono.ttf", 24),
+        TTF_CloseFont);
     if (font24 == nullptr) {
         std::cout << "Loading font failed\n";
         return false;
     }
 
-    font16 = TTF_OpenFont("DejaVuSansMono.ttf", 16);
+    font16 = std::unique_ptr<TTF_Font, void(*)(TTF_Font*)>(
+        TTF_OpenFont("DejaVuSansMono.ttf", 16),
+        TTF_CloseFont);
     if (font16 == nullptr) {
         std::cout << "Loading font failed\n";
         return false;
@@ -177,16 +242,16 @@ bool HUD::init(void) {
 }
 
 void HUD::render_text(const char *text, SDL_Rect *location, SDL_Color *color,
-                     enum FontSize s) {
+                      FontSize s) {
     SDL_Surface *initial;
     SDL_Surface *intermediary;
     int w, h;
     GLuint texture;
 
-    if (s == size24) {
-        initial = TTF_RenderUTF8_Blended(font24, text, *color);
+    if (s == FontSize::size24) {
+        initial = TTF_RenderUTF8_Blended(font24.get(), text, *color);
     } else {
-        initial = TTF_RenderUTF8_Blended(font16, text, *color);
+        initial = TTF_RenderUTF8_Blended(font16.get(), text, *color);
     }
 
     w = Graphics::nextpoweroftwo(initial->w);
@@ -261,5 +326,9 @@ void HUD::gl_disable2_d() {
     glPopMatrix();
     glMatrixMode(GL_MODELVIEW);
     glPopMatrix();
+}
+
+HUD::~HUD() {
+    TTF_Quit();
 }
 } // namespace ca

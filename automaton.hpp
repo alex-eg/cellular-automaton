@@ -38,7 +38,7 @@ public:
     }
 
     AutomatonState(const AutomatonState &other) = default;
-    AutomatonState &operator = (const AutomatonState &right) {
+    AutomatonState &operator=(const AutomatonState &right) {
         if (this == &right) {
             return *this;
 }
@@ -54,7 +54,7 @@ public:
 
 class AutomatonTransition {
 private:
-    std::map <statecode, Set<int>> requirements;
+    std::map<statecode, Set<int>> requirements;
     statecode met_code, unmet_code;
 public:
     std::string name;
@@ -73,7 +73,7 @@ public:
     AutomatonTransition &operator = (const AutomatonTransition &right) {
         if (this == &right) {
             return *this;
-}
+        }
         name = right.name;
         requirements = right.requirements;
         met_code = right.met_code;
@@ -81,47 +81,49 @@ public:
         return *this;
     }
 
-    statecode &operator () (std::map <statecode, int> neighbours) {
+    statecode &operator()(std::map<statecode, int> neighbours) {
         bool r_met = true;
-        std::map <statecode, Set<int>>::iterator it = requirements.begin();
+        std::map<statecode, Set<int>>::iterator it = requirements.begin();
         for (; it != requirements.end(); it++) {
             statecode req_code =(*it).first;
             int neighbour_count = (*neighbours.find(req_code)).second;
             if ( !(*it).second.in(neighbour_count) ) { r_met = false;
-}
+            }
         }
 
-        if (r_met) { return met_code;
-        } else { return unmet_code;
-}
+        if (r_met) {
+            return met_code;
+        } else {
+            return unmet_code;
+        }
     }
 };
 
 class Automaton {
 private:
     u32 width, height;
-    LMatrix <statecode> field1;
-    LMatrix <statecode> field2;
-    LMatrix <statecode> *back;
-    std::map <statecode, int> neighbours(u32 x, u32 y);
+    LMatrix<statecode> field1;
+    LMatrix<statecode> field2;
+    LMatrix<statecode> *back;
+    std::map<statecode, int> neighbours(u32 x, u32 y);
 public:
-    std::map <statecode, AutomatonTransition> transition;
-    std::map <statecode, AutomatonState> state;
-    std::map <statecode, u32> state_count;
-    LMatrix <statecode> *front;
+    std::map<statecode, AutomatonTransition> transition;
+    std::map<statecode, AutomatonState> state;
+    std::map<statecode, u32> state_count;
+    LMatrix<statecode> *front;
 
     Automaton() {
         front = nullptr;
         back = nullptr;
     }
 
-    statecode &operator () (u32 i, u32 j) {
+    statecode &operator()(u32 i, u32 j) {
         return (*front)(i,j);
     }
 
     Automaton(u32 w, u32 h) : width(w), height(h) {
-        field1 = LMatrix <statecode> (width, height);
-        field2 = LMatrix <statecode> (width, height);
+        field1 = LMatrix<statecode>(width, height);
+        field2 = LMatrix<statecode>(width, height);
         front = &field1;
         back = &field2;
 
